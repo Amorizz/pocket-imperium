@@ -2,6 +2,8 @@ package Project;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.InputMismatchException;
 
 public class Game {
     private static Game instance;
@@ -42,12 +44,30 @@ public class Game {
     }
 
     public static void main(String[] args) {
-    Game game = Game.getInstance();
-    game.addPlayer("Joueur 1");
-    game.addPlayer("Joueur 2");
-    game.start();
-    System.out.println("État du jeu : " + game.getState());
-    System.out.println("Liste des joueurs : " + game.getPlayers());
+        Game game = Game.getInstance();
+        try (Scanner scanner = new Scanner(System.in)) {
+            int nombreJoueurs = -1;
+            while (nombreJoueurs < 0) {
+                System.out.println("Combien de joueurs vont jouer ?");
+                try {
+                    nombreJoueurs = scanner.nextInt();
+                    if (nombreJoueurs < 0) {
+                        System.out.println("Erreur : Veuillez entrer un nombre entier positif.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Erreur : Veuillez entrer un nombre entier.");
+                    scanner.next(); // Consomme l'entrée invalide
+                }
+            }
+            for (int i = 0; i < nombreJoueurs; i++) {
+                System.out.println("Nom du joueur " + (i + 1) + " ?");
+                String nomJoueur = scanner.next();
+                game.addPlayer(nomJoueur);
+            }
+            game.start();
+            System.out.println("État du jeu : " + game.getState());
+            System.out.println("Liste des joueurs : " + game.getPlayers());
+        }
     }
 }
 
