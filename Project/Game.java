@@ -7,12 +7,15 @@ import java.util.InputMismatchException;
 
 public class Game {
     private static Game instance;
-    private List<String> players;
+    private List<Player> players;
+    private List<Round> rounds;
+    private int currentRoundIndex;
     private String state;
 
     private Game() {
-        // Initialisation de l'instance
         players = new ArrayList<>();
+        rounds = new ArrayList<>();
+        currentRoundIndex = 0;
         state = "waiting";
     }
 
@@ -23,15 +26,34 @@ public class Game {
         return instance;
     }
 
-    public void addPlayer(String player) {
+    public void addPlayer(Player player) {
         players.add(player);
     }
 
     public void start() {
         if (players.size() > 1) {
             state = "in progress";
+            createRounds(5); // Par exemple, créer 5 rounds
+            startNextRound();
         } else {
             System.out.println("Not enough players to start the game.");
+        }
+    }
+
+    private void createRounds(int numberOfRounds) {
+        for (int i = 0; i < numberOfRounds; i++) {
+            rounds.add(new Round(i + 1, players));
+        }
+    }
+
+    private void startNextRound() {
+        if (currentRoundIndex < rounds.size()) {
+            Round currentRound = rounds.get(currentRoundIndex);
+            currentRound.startRound(players.get(0)); // Par exemple, commencer avec le premier joueur
+            currentRoundIndex++;
+        } else {
+            System.out.println("All rounds completed.");
+            state = "finished";
         }
     }
 
@@ -39,8 +61,19 @@ public class Game {
         return state;
     }
 
-    public List<String> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
+    }
+
+    public List<String> getPlayerNames() {
+        List<String> playerNames = new ArrayList<>();
+        for (Player player : players) {
+            if (player != null) {
+                System.out.println(player.getPlayerName());
+                playerNames.add(player.getPlayerName());
+            }
+        }
+        return playerNames;
     }
 
     public static void main(String[] args) {
@@ -62,11 +95,11 @@ public class Game {
             for (int i = 0; i < nombreJoueurs; i++) {
                 System.out.println("Nom du joueur " + (i + 1) + " ?");
                 String nomJoueur = scanner.next();
-                game.addPlayer(nomJoueur);
+                game.addPlayer(new Player(nomJoueur));
             }
             game.start();
             System.out.println("État du jeu : " + game.getState());
-            System.out.println("Liste des joueurs : " + game.getPlayers());
+            System.out.println("Liste des joueurs : " + game.getPlayerNames());
 
             //creer le round, les bateaux et toutes les autres classes ...
         }

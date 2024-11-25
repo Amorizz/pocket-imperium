@@ -1,9 +1,9 @@
 package Project;
 
 public class Ship {
-    private String Color;
-    private int ShippNumber;
-    private int maxShip;
+    private String color;
+    private int shippnumber;
+    private int maxship;
 
     public boolean canAddShip(){
         return true;

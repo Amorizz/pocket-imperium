@@ -1,10 +1,10 @@
 package Project;
 
 public class Hex {
-    private String ShipOn;
-    private String MaxShipOn;
-    private String Occupation;
-    private String Level;
+    private String shipon;
+    private String maxshipon;
+    private String occupation;
+    private String level;
 
     public void addShip(){};
 
