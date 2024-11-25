@@ -1,11 +1,43 @@
 package Project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Game {
-    private int roundNumber; // Attention deux meme atribut sur Game et sur Round
+    private static Game instance;
+    private List<String> players;
+    private String state;
 
-    public void startgame(){};
+    private Game() {
+        // Initialisation de l'instance
+        players = new ArrayList<>();
+        state = "waiting";
+    }
 
-    public void placcCard(){};
+    public static Game getInstance() {
+        if (instance == null) {
+            instance = new Game();
+        }
+        return instance;
+    }
 
-    public void stopGame(){}; // Pourquoi faire ?
+    public void addPlayer(String player) {
+        players.add(player);
+    }
+
+    public void start() {
+        if (players.size() > 1) {
+            state = "in progress";
+        } else {
+            System.out.println("Not enough players to start the game.");
+        }
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public List<String> getPlayers() {
+        return players;
+    }
 }
