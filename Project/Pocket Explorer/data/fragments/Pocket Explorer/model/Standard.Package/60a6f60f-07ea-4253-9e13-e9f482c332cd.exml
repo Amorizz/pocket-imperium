@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="pocket explorer" version="4">
+  <OBJECT>
+    <ID name="pocket explorer" mc="Standard.Package" uid="60a6f60f-07ea-4253-9e13-e9f482c332cd"/>
+    <PID name="Pocket Explorer" mc="Standard.Project" uid="faa085fd-94c0-4f50-8b52-9dd899656e24"/>
+    <ATTRIBUTES>
+      <ATT name="IsInstantiable">false</ATT>
+      <ATT name="IsAbstract">false</ATT>
+      <ATT name="IsLeaf">false</ATT>
+      <ATT name="IsRoot">false</ATT>
+      <ATT name="Visibility">Public</ATT>
+      <ATT name="Name"><![CDATA[pocket explorer]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedBehavior">
+        <COMPID name="Interaction" mc="Standard.Interaction" uid="9c87b4d9-3843-4667-bc5f-7d330d278693"/>
+      </COMP>
+      <COMP relation="OwnedInformationFlow">
+        <OBJECT>
+          <ID name="startGame()" mc="Standard.InformationFlow" uid="a9fa11be-8cb1-4de1-805b-5ddb51c9c86b"/>
+          <ATTRIBUTES>
+            <ATT name="Name"><![CDATA[startGame()]]></ATT>
+            <ATT name="status">1970354901745664</ATT>
+          </ATTRIBUTES>
+          <DEPENDENCIES>
+            <LINK relation="InformationSource">
+              <REFOBJ>
+                <ID name="Game" mc="Standard.Lifeline" uid="555586f4-1447-44f5-8350-cf6f78ad526f"/>
+              </REFOBJ>
+            </LINK>
+            <LINK relation="InformationTarget">
+              <REFOBJ>
+                <ID name="Game" mc="Standard.Lifeline" uid="555586f4-1447-44f5-8350-cf6f78ad526f"/>
+              </REFOBJ>
+            </LINK>
+          </DEPENDENCIES>
+        </OBJECT>
+      </COMP>
+      <COMP relation="OwnedElement">
+        <COMPID name="Sector Card" mc="Standard.Class" uid="943cdff4-9cba-456f-b8e6-a5af77670c72"/>
+        <COMPID name="Card" mc="Standard.Class" uid="8f745d40-2db6-4bbd-9c01-84a9eda05e71"/>
+        <COMPID name="Player" mc="Standard.Class" uid="dba0e6ba-a6da-404e-8e2d-dac365d7c77a"/>
+        <COMPID name="Game" mc="Standard.Class" uid="dc7d03d3-96eb-4969-8ca4-da4b99256ea8"/>
+        <COMPID name="Round" mc="Standard.Class" uid="28b1f70b-5efd-4ae6-983e-aaa952822c14"/>
+        <COMPID name="Ship" mc="Standard.Class" uid="c86efc8f-71cc-4f3a-8f1e-b9f19a2bb294"/>
+        <COMPID name="Command Card" mc="Standard.Class" uid="3d333aaa-ba3b-4a39-9731-e972d6981e35"/>
+        <COMPID name="Hex" mc="Standard.Class" uid="8617abab-9423-4847-83bb-a92d3388b1e7"/>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="Diagramme de classe pocket explorer" mc="Standard.ClassDiagram" uid="045768f8-6e60-4c4d-8280-60f5afb66855"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>
