@@ -40,4 +40,14 @@ public class Game {
     public List<String> getPlayers() {
         return players;
     }
+
+    public static void main(String[] args) {
+    Game game = Game.getInstance();
+    game.addPlayer("Joueur 1");
+    game.addPlayer("Joueur 2");
+    game.start();
+    System.out.println("État du jeu : " + game.getState());
+    System.out.println("Liste des joueurs : " + game.getPlayers());
+    }
 }
+
