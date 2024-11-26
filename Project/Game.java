@@ -4,17 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.util.Random;
 
 public class Game {
     private static Game instance;
     private List<Player> players;
     private List<Round> rounds;
+    private static SectorCard[][] plateau;
     private int currentRoundIndex;
     private String state;
 
     private Game() {
         players = new ArrayList<>();
         rounds = new ArrayList<>();
+        plateau = new SectorCard[3][3];
         currentRoundIndex = 0;
         state = "waiting";
     }
@@ -103,6 +106,26 @@ public class Game {
 
             //creer le round, les bateaux et toutes les autres classes ...
         }
+        // Creation triPri
+        SectorCard triPri = new SectorCard(4,true,false,false);
+        // Creation des 3 cartes bottom
+        for (int i = 0; i < 3;i++){
+            SectorCard carteb = new SectorCard(i,false,true,false);
+            plateau[0][i] = carteb;
+        }
+        // Creation des 3 cartes top
+        for (int i = 0; i < 3;i++){
+            SectorCard cartet = new SectorCard(i,false,false,true);
+            plateau[2][i] = cartet;
+        }
+        // Creation des 2 cartes mid
+        SectorCard cartem1 = new SectorCard(1,false,false,false);
+        plateau[1][0] = cartem1;
+        plateau[1][1] = triPri;
+        SectorCard cartem2 = new SectorCard(2,false,false,false);
+        plateau[1][2] = cartem2;
+
+        System.out.println(plateau[1][1].getHexa(2));
     }
 }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="Pocket Explorer" version="4">
+  <OBJECT>
+    <ID name="Pocket Explorer" mc="Infrastructure.DiagramSet" uid="5da3fde0-62c4-49e8-8dab-322dac23ff3f"/>
+    <PID name="Pocket Explorer" mc="Standard.Project" uid="faa085fd-94c0-4f50-8b52-9dd899656e24"/>
+    <ATTRIBUTES>
+      <ATT name="Name"><![CDATA[Pocket Explorer]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES></DEPENDENCIES>
+  </OBJECT>
+</EXT>
