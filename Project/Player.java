@@ -1,16 +1,17 @@
 package Project;
 
+import java.lang.reflect.Array;
+import java.util.List;
+
 public class Player {
     private int shipNumber;
-    private int startPlayer;
     private String playerName;
-    private String cardOrder[];
+    private List<String> cardOrder;
     private int points;
     private String name;
 
-    public Player(int shipNumber, int startPlayer, String playerName, String[] cardOrder, int points) {
+    public Player(int shipNumber, String playerName, List<String> cardOrder, int points) {
         this.shipNumber = shipNumber;
-        this.startPlayer = startPlayer;
         this.playerName = playerName;
         this.cardOrder = cardOrder;
         this.points = points;
@@ -21,7 +22,7 @@ public class Player {
     }
 
     public void chooseOrder() {
-        // Logique pour choisir l'ordre des cartes
+        };
     }
 
     public void useCard(int cardId) {
