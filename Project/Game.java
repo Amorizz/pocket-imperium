@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.InputMismatchException;
+import java.util.Collections;
 
 public class Game {
     private static Game instance;
@@ -11,6 +12,7 @@ public class Game {
     private List<Round> rounds;
     private int currentRoundIndex;
     private String state;
+    private List<SectorCard> sectorCards;
 
     private Game() {
         players = new ArrayList<>();
@@ -105,6 +107,31 @@ public class Game {
             game.startNextRound();
 
     
+        }
+    }
+
+    public void createSectorCards() {
+        // Initialisation de la liste
+        sectorCards = new ArrayList<>();
+        
+        // Création des 9 cartes
+        for (int i = 0; i < 9; i++) {
+            SectorCard card = new SectorCard();
+            card.setNumber(i);
+            card.setPosition(i); // Position fixe égale au numéro
+            card.setOccupied(false);
+            
+            // Carte TriPrime au centre (position 4)
+            if (i == 4) {
+                card.setTriPrime(true);
+            } else {
+                card.setTriPrime(false);
+            }
+            
+            // Bordures pour les cartes du haut (0,1,2) et du bas (6,7,8)
+            card.setBorder(i <= 2 || i >= 6);
+            
+            sectorCards.add(card);
         }
     }
 }
