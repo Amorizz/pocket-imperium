@@ -100,8 +100,11 @@ public class Game {
             game.start();
             System.out.println("État du jeu : " + game.getState());
             System.out.println("Liste des joueurs : " + game.getPlayerNames());
+            
+            game.createRounds(9);
+            game.startNextRound();
 
-            //creer le round, les bateaux et toutes les autres classes ...
+    
         }
     }
 }
