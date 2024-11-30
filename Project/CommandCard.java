@@ -1,7 +1,6 @@
 package Project;
 
 public class CommandCard {
-    private int id;
 
     public CommandCard(){
     }

@@ -63,7 +63,7 @@ public class Player {
         return new ArrayList<>(cards);
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Player joueur = new Player(5, "Jean-Pierre", 10);
         joueur.placeShips(5); // Placer 5 vaisseaux
         System.out.println("Nombre de vaisseaux du joueur : " + joueur.getShips());
@@ -71,6 +71,6 @@ public class Player {
         joueur.chooseOrder(); // Sélectionner l'ordre des cartes
         System.out.println("Cartes du joueur : " + joueur.getCards());
         // Tester l'utilisation d'une carte
-        joueur.useCard(1);     }
+        joueur.useCard(1);     }*/
 
 }
