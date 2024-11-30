@@ -1,10 +1,7 @@
 package Project;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class SectorCard {
     private int number;
@@ -14,14 +11,13 @@ public class SectorCard {
     private boolean top;
     private Map<Integer, Hex> Hexa;
 
-    public ArrayList<Integer> position21(int nbr){
-        ArrayList<Integer> LNBR = new ArrayList<>();
-        while(LNBR.size() != 3){
-            Random randomNumbers = new Random();
-            int n = randomNumbers.nextInt(nbr);
-            LNBR.add(n);
+    public ArrayList<Integer> position21(int nbr) {
+        Set<Integer> uniquePositions = new HashSet<>();
+        Random random = new Random();
+        while (uniquePositions.size() < 3) {
+            uniquePositions.add(random.nextInt(nbr) + 1); // +1 pour éviter l'index 0
         }
-        return LNBR;
+        return new ArrayList<>(uniquePositions);
     }
 
     public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
@@ -37,12 +33,12 @@ public class SectorCard {
                 this.Hexa.put(i+1, Hex1);
             }
             Hex Hex2 = new Hex(2);
-            this.Hexa.put(LNBR.getFirst(), Hex2);
+            this.Hexa.put(LNBR.get(0), Hex2);
             Hex Hex11 = new Hex(1);
             this.Hexa.put(LNBR.get(1), Hex11);
             Hex Hex12 = new Hex(1);
             this.Hexa.put(LNBR.get(2), Hex12);
-        } else if (!this.bottom && !this.top) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
+        } else if (!this.bottom && !this.top && !this.triPrime) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
             ArrayList<Integer> LNBR = position21(8);
             for (int i = 0;i<8;i++){
                 Hex Hex1 = new Hex(0);
@@ -54,7 +50,7 @@ public class SectorCard {
             this.Hexa.put(LNBR.get(1), Hex11);
             Hex Hex12 = new Hex(1);
             this.Hexa.put(LNBR.get(2), Hex12);
-        } else {                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
+        } else if (this.triPrime){                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
             Random randomNumbers = new Random();
             Hex Hex1 = new Hex(0);
             this.Hexa.put(1, Hex1);
