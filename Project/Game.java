@@ -130,6 +130,7 @@ public class Game {
 
         System.out.println(plateau[1][1].getHexa(3));
 
+        
 
     }
 }
