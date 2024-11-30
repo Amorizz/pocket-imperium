@@ -1,23 +1,19 @@
 package Project;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.InputMismatchException;
-import java.util.Random;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Game {
     private static Game instance;
     private List<Player> players;
     private List<Round> rounds;
-    private static SectorCard[][] plateau;
+    private static SectorCard[][] plateau = new SectorCard[3][3];
     private int currentRoundIndex;
     private String state;
 
     private Game() {
         players = new ArrayList<>();
         rounds = new ArrayList<>();
-        plateau = new SectorCard[3][3];
         currentRoundIndex = 0;
         state = "waiting";
     }
