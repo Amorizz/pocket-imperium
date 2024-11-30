@@ -3,13 +3,12 @@ package Project;
 public class CommandCard {
     private int id;
 
-    public CommandCard(int id){
-        this.id = id;
+    public CommandCard(){
     }
 
-    public void executeCard(int idCard){
+    public void executeCard(int idCard /*, enum Color */){
         if (id == 0){
-            //expand
+            //expand 
         } else if (id == 1){
             //explore
         } else {
