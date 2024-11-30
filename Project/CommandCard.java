@@ -1,14 +1,18 @@
 package Project;
 
 public class CommandCard {
-    private String id;
-    private String color;
 
-    public void executeCard(){};
+    public CommandCard(){
+    }
 
-    public void invade(){};
+    public void executeCard(int idCard /*, enum Color */){
+        if (id == 0){
+            //expand 
+        } else if (id == 1){
+            //explore
+        } else {
+            //invade
+        }
+    };
 
-    public void expand(){};
-
-    public void explore(){};
 }
