@@ -1,6 +1,5 @@
 package Project;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Game {
@@ -10,6 +9,7 @@ public class Game {
     private static SectorCard[][] plateau = new SectorCard[3][3];
     private int currentRoundIndex;
     private String state;
+    private static HashMap<String, ArrayList<SectorCard>> jeux;
 
     private Game() {
         players = new ArrayList<>();
@@ -60,6 +60,37 @@ public class Game {
         return state;
     }
 
+    public static HashMap<String, ArrayList<SectorCard>> plateau(){
+        // Création Carte Top
+        jeux = new HashMap<String, ArrayList<SectorCard>>();
+        ArrayList<SectorCard> top = new ArrayList<>();
+        for (int i = 0; i < 3;i++){
+            SectorCard carteb = new SectorCard(i,false,false,true);
+            top.add(carteb);
+        }
+        jeux.put("Top",top);
+
+        // Création Carte Mid
+        ArrayList<SectorCard> mid = new ArrayList<>();
+        SectorCard cartem1 = new SectorCard(1,false,false,false);
+        mid.add(cartem1);
+        SectorCard triPri = new SectorCard(2,true,false,false);
+        mid.add(triPri);
+        SectorCard cartem2 = new SectorCard(3,false,false,false);
+        mid.add(cartem2);
+        jeux.put("Mid",mid);
+
+        // Création Carte Bottom
+        ArrayList<SectorCard> bottom = new ArrayList<>();
+        for (int i = 0; i < 3;i++){
+            SectorCard cartet = new SectorCard(i,false,true,false);
+            bottom.add(cartet);
+        }
+        jeux.put("Bottom",bottom);
+
+        return jeux;
+    }
+
     public List<Player> getPlayers() {
         return players;
     }
@@ -105,28 +136,9 @@ public class Game {
 
     
         }
-        // Creation triPri
-        SectorCard triPri = new SectorCard(4,true,false,false);
-        // Creation des 3 cartes top
-        for (int i = 0; i < 3;i++){
-            SectorCard carteb = new SectorCard(i,false,false,true);
-            plateau[0][i] = carteb;
-        }
-        // Creation des 3 cartes bottom
-        for (int i = 0; i < 3;i++){
-            SectorCard cartet = new SectorCard(i,false,true,false);
-            plateau[2][i] = cartet;
-        }
-        // Creation des 2 cartes mid
-        SectorCard cartem1 = new SectorCard(1,false,false,false);
-        plateau[1][0] = cartem1;
-        plateau[1][1] = triPri;
-        SectorCard cartem2 = new SectorCard(2,false,false,false);
-        plateau[1][2] = cartem2;
-
-        System.out.println(plateau[1][1].getHexa(3));
-
-        
+        jeux = new HashMap<String, ArrayList<SectorCard>>();
+        jeux = plateau();
+        System.out.println(jeux.get("Mid").get(1).getHexa(3));
 
     }
 }

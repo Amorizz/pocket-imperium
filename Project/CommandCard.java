@@ -6,9 +6,9 @@ public class CommandCard {
     }
 
     public void executeCard(int idCard /*, enum Color */){
-        if (id == 0){
+        if (idCard == 0){
             //expand 
-        } else if (id == 1){
+        } else if (idCard == 1){
             //explore
         } else {
             //invade
