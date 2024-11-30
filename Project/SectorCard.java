@@ -1,108 +1,77 @@
 package Project;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 public class SectorCard {
     private int number;
-    private int position;
-    private boolean isOccupied;
-    private boolean isTriPrime;
-    private boolean isBottom;
-    private boolean isTop;
-    private boolean hasBorder;
-    private Player occupiedBy;
+    private int position = 0;
+    private boolean triPrime;
+    private boolean bottom;
+    private boolean top;
+    private Map<Integer, Hex> Hexa;
 
-    // Constructeur
-    public SectorCard() {
-        this.isOccupied = false;
-        this.isTriPrime = false;
-        this.isBottom = false;
-        this.isTop = false;
-        this.hasBorder = false;
-        this.occupiedBy = null;
-    }
-
-    // Getters et Setters
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
+    public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
         this.number = number;
+        this.triPrime = triPrime;
+        this.bottom = bottom;
+        this.top = top;
+        this.Hexa = new HashMap<Integer, Hex>();    // Les hexagones seront ajouté dans une map (dictionnaire)
+        if (this.bottom || this.top) {              // Création des Hexagons dans la carte secteur si c'est une carte bottom ou top
+            Random randomNumbers = new Random();
+            Hex Hex1 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(1, Hex1);
+            Hex Hex2 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(2, Hex2);
+            Hex Hex3 = new Hex(0);
+            this.Hexa.put(3, Hex3);
+            Hex Hex4 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(4, Hex4);
+            Hex Hex5 = new Hex(0);
+            this.Hexa.put(5, Hex5);
+            Hex Hex6 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(6, Hex6);
+            Hex Hex7 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(7,Hex7);
+        } else if (!this.bottom && !this.top) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
+            Random randomNumbers = new Random();
+            Hex Hex1 = new Hex(0);
+            this.Hexa.put(1, Hex1);
+            Hex Hex2 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(2, Hex2);
+            Hex Hex3 = new Hex(0);
+            this.Hexa.put(3,Hex3);
+            Hex Hex4 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(4, Hex4);
+            Hex Hex5 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(5, Hex5);
+            Hex Hex6 = new Hex(0);
+            this.Hexa.put(6, Hex6);
+            Hex Hex7 = new Hex(randomNumbers.nextInt(3));
+            this.Hexa.put(7, Hex7);
+            Hex Hex8 = new Hex(0);
+            this.Hexa.put(8, Hex8);
+        } else {                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
+            Random randomNumbers = new Random();
+            Hex Hex1 = new Hex(0);
+            this.Hexa.put(1, Hex1);
+            Hex Hex2 = new Hex(0);
+            this.Hexa.put(2, Hex2);
+            Hex HexTri = new Hex(3);
+            this.Hexa.put(3,HexTri);
+            Hex Hex3 = new Hex(0);
+            this.Hexa.put(4, Hex3);
+            Hex Hex4 = new Hex(0);
+            this.Hexa.put(5, Hex4);
+        }
     }
 
-    public int getPosition() {
-        return position;
+    public String toString(){
+        return "Cette carte contient "+Hexa.size()+" Hexagone";
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public boolean isOccupied() {
-        return isOccupied;
-    }
-
-    public void setOccupied(boolean occupied) {
-        this.isOccupied = occupied;
-    }
-
-    public boolean isTriPrime() {
-        return isTriPrime;
-    }
-
-    public void setTriPrime(boolean triPrime) {
-        this.isTriPrime = triPrime;
-    }
-
-    public boolean isBottom() {
-        return isBottom;
-    }
-
-    public void setBottom(boolean bottom) {
-        this.isBottom = bottom;
-    }
-
-    public boolean isTop() {
-        return isTop;
-    }
-
-    public void setTop(boolean top) {
-        this.isTop = top;
-    }
-
-    public boolean hasBorder() {
-        return hasBorder;
-    }
-
-    public void setBorder(boolean border) {
-        this.hasBorder = border;
-    }
-
-    public Player getOccupiedBy() {
-        return occupiedBy;
-    }
-
-    public void setOccupiedBy(Player player) {
-        this.occupiedBy = player;
-        this.isOccupied = (player != null);
-    }
-
-    // Méthodes utilitaires
-    public void clearOccupation() {
-        this.occupiedBy = null;
-        this.isOccupied = false;
-    }
-
-    @Override
-    public String toString() {
-        return "SectorCard{" +
-                "number=" + number +
-                ", position=" + position +
-                ", isOccupied=" + isOccupied +
-                ", isTriPrime=" + isTriPrime +
-                ", isBottom=" + isBottom +
-                ", isTop=" + isTop +
-                ", hasBorder=" + hasBorder +
-                ", occupiedBy=" + occupiedBy +
-                '}';
+    public Hex getHexa(int nbr){
+        return Hexa.get(nbr);
     }
 }
