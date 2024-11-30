@@ -1,5 +1,6 @@
 package Project;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -11,6 +12,8 @@ public class SectorCard {
     private boolean bottom;
     private boolean top;
     private Map<Integer, Hex> Hexa;
+
+
 
     public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
         this.number = number;

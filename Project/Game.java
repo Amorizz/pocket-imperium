@@ -1,23 +1,19 @@
 package Project;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.InputMismatchException;
-import java.util.Random;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Game {
     private static Game instance;
     private List<Player> players;
     private List<Round> rounds;
-    private static SectorCard[][] plateau;
+    private Map<String, ArrayList<SectorCard>> plateau;
     private int currentRoundIndex;
     private String state;
 
     private Game() {
         players = new ArrayList<>();
         rounds = new ArrayList<>();
-        plateau = new SectorCard[3][3];
         currentRoundIndex = 0;
         state = "waiting";
     }
@@ -79,6 +75,32 @@ public class Game {
         return playerNames;
     }
 
+    public Map<String, ArrayList<SectorCard>> placeSectorCard(){
+        ArrayList<SectorCard> top = new ArrayList<>();
+        for (int i = 0; i < 3;i++){
+            SectorCard ctop = new SectorCard(i,false,false,true);
+            top.add(ctop);
+        }
+        plateau.put("Top",top);
+
+        ArrayList<SectorCard> Mid =  new ArrayList<>();
+        SectorCard mid1 = new SectorCard(2,false,false,false);
+        Mid.add(mid1);
+        SectorCard triPri = new SectorCard(4,true,false,false);
+        Mid.add(triPri);
+        SectorCard mid2 = new SectorCard(5,false,false,false);
+        Mid.add(mid2);
+        plateau.put("Mid",Mid);
+
+        ArrayList<SectorCard> bottom = new ArrayList<>();
+        for (int i = 0; i < 3;i++){
+            SectorCard cbottom = new SectorCard(i,false,false,true);
+            bottom.add(cbottom);
+        }
+        plateau.put("Bottom",bottom);
+        return plateau;
+    }
+
     public static void main(String[] args) {
         Game game = Game.getInstance();
         try (Scanner scanner = new Scanner(System.in)) {
@@ -109,26 +131,10 @@ public class Game {
 
     
         }
-        // Creation triPri
-        SectorCard triPri = new SectorCard(4,true,false,false);
-        // Creation des 3 cartes top
-        for (int i = 0; i < 3;i++){
-            SectorCard carteb = new SectorCard(i,false,false,true);
-            plateau[0][i] = carteb;
-        }
-        // Creation des 3 cartes bottom
-        for (int i = 0; i < 3;i++){
-            SectorCard cartet = new SectorCard(i,false,true,false);
-            plateau[2][i] = cartet;
-        }
-        // Creation des 2 cartes mid
-        SectorCard cartem1 = new SectorCard(1,false,false,false);
-        plateau[1][0] = cartem1;
-        plateau[1][1] = triPri;
-        SectorCard cartem2 = new SectorCard(2,false,false,false);
-        plateau[1][2] = cartem2;
 
-        System.out.println(plateau[1][1].getHexa(3));
+        game.plateau = game.placeSectorCard();
+
+        System.out.println(game.plateau.get("Mid").get(1));
 
 
     }
