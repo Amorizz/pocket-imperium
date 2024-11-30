@@ -111,14 +111,14 @@ public class Game {
         }
         // Creation triPri
         SectorCard triPri = new SectorCard(4,true,false,false);
-        // Creation des 3 cartes bottom
-        for (int i = 0; i < 3;i++){
-            SectorCard carteb = new SectorCard(i,false,true,false);
-            plateau[0][i] = carteb;
-        }
         // Creation des 3 cartes top
         for (int i = 0; i < 3;i++){
-            SectorCard cartet = new SectorCard(i,false,false,true);
+            SectorCard carteb = new SectorCard(i,false,false,true);
+            plateau[0][i] = carteb;
+        }
+        // Creation des 3 cartes bottom
+        for (int i = 0; i < 3;i++){
+            SectorCard cartet = new SectorCard(i,false,true,false);
             plateau[2][i] = cartet;
         }
         // Creation des 2 cartes mid
@@ -128,7 +128,9 @@ public class Game {
         SectorCard cartem2 = new SectorCard(2,false,false,false);
         plateau[1][2] = cartem2;
 
-        System.out.println(plateau[1][1].getHexa(2));
+        System.out.println(plateau[1][1].getHexa(3));
+
+
     }
 }
 
