@@ -98,7 +98,7 @@ public class Game {
             for (int i = 0; i < nombreJoueurs; i++) {
                 System.out.println("Nom du joueur " + (i + 1) + " ?");
                 String nomJoueur = scanner.next();
-                game.addPlayer(new Player(nomJoueur));
+                game.addPlayer(new Player(0, nomJoueur, 0));
             }
             game.start();
             System.out.println("État du jeu : " + game.getState());
@@ -130,6 +130,7 @@ public class Game {
 
         System.out.println(plateau[1][1].getHexa(3));
 
+        
 
     }
 }
