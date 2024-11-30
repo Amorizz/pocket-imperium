@@ -6,7 +6,7 @@ public class CommandCard {
 
     public void executeCard(){};
 
-    public void invade(){}; //Pourquoi faire ?
+    public void invade(){};
 
     public void expand(){};
 

@@ -10,21 +10,9 @@ public class Player {
     private int points;
     private String name;
 
-    public Player(int shipNumber, String playerName, List<String> cardOrder, int points) {
-        this.shipNumber = shipNumber;
-        this.playerName = playerName;
-        this.cardOrder = cardOrder;
-        this.points = points;
-    }
-
     public Player(String playerName) {
         this.playerName = playerName;
     }
-
-    public void chooseOrder() {
-        };
-    }
-
     public void useCard(int cardId) {
         // Logique pour utiliser une carte spécifique
     }
