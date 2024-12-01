@@ -72,4 +72,8 @@ public class SectorCard {
     public Hex getHexa(int nbr){
         return Hexa.get(nbr);
     }
+
+    public Map<Integer, Hex> getHex() {
+        return this.Hexa;
+    }
 }

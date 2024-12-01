@@ -5,6 +5,7 @@ public class Hex {
     final int maxshipon;
     private Player occupation;
     final int level;
+    private String color;
 
     public Hex(int level) {
         this.level = level;
@@ -44,8 +45,8 @@ public class Hex {
         return occupation;
     }
 
-    public void setOccupation(Player occupation) {
-        this.occupation = occupation;
+    public void setOccupation(String color) {
+        this.color = color;
     }
 
     public int getLevel() {
