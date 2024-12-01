@@ -130,15 +130,15 @@ public class Game {
             game.start();
             System.out.println("État du jeu : " + game.getState());
             System.out.println("Liste des joueurs : " + game.getPlayerNames());
-            
-            game.createRounds(9);
-            game.startNextRound();
-
-    
+        
         }
         jeux = new HashMap<String, ArrayList<SectorCard>>();
         jeux = plateau();
         System.out.println(jeux.get("Mid").get(1).getHexa(3));
+        game.createRounds(9);
+        
+        //placer les premiers bazteaux
+        //game.startNextRound();
 
     }
 }

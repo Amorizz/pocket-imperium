@@ -2,14 +2,14 @@ package Project;
 
 public class Hex {
     private int shipon;
-    private int maxshipon;
-    private String occupation;
-    private int level;
+    final int maxshipon;
+    private Player occupation;
+    final int level;
 
     public Hex(int level) {
         this.level = level;
         this.maxshipon = level+1;
-        this.occupation = "";
+        this.occupation = null;
         this.shipon = 0;
     }
 
@@ -17,9 +17,39 @@ public class Hex {
         return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par "+occupation+" et son niveau est "+level;
     }
 
-    public void addShip(){};
+    public void addShip(int number){
+        //on ajoute un certain nombre de bateaux 
+        this.shipon += number;
+        
+    };
 
     public void removeShip(){}; //Pourquoi faire ?
 
     public void change(){};
+
+    // Getters et Setters
+    public int getShipon() {
+        return shipon;
+    }
+
+    public void setShipon(int shipon) {
+        this.shipon = shipon;
+    }
+
+    public int getMaxshipon() {
+        return maxshipon;
+    }
+
+    public Player getOccupation() {
+        return occupation;
+    }
+
+    public void setOccupation(Player occupation) {
+        this.occupation = occupation;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
 }
