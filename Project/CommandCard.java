@@ -1,14 +1,20 @@
 package Project;
 
 public class CommandCard {
+    private int id;
 
-    public CommandCard(){
+    public CommandCard(int id){
+        this.id = id;
     }
 
-    public void executeCard(int idCard /*, enum Color */){
-        if (idCard == 0){
+    public int getId(){
+        return this.id;
+    }
+
+    public void executeCard(/*, enum Color */){
+        if (this.id == 0){
             //expand 
-        } else if (idCard == 1){
+        } else if (this.id == 1){
             //explore
         } else {
             //invade
