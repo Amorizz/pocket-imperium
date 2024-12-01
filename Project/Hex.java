@@ -23,9 +23,9 @@ public class Hex {
         
     };
 
-    public void removeShip(){}; //Pourquoi faire ?
-
-    public void change(){};
+    public void removeShip(int number){
+        this.shipon -= number;
+    };
 
     // Getters et Setters
     public int getShipon() {

@@ -65,8 +65,16 @@ public class Player {
 
     }
 
-    public void placeShips(int numberOfShips) {
-        // Logique pour placer un certain nombre de vaisseaux
+    public void placeFirstShips() {
+        /*demande au joueur sur quel hexagone placer et cmb de bateaxu 
+        - verifie tout les critère :
+            - sector innocupé 
+            - l'hex est bien un system
+
+        - place les bateaux et addshipNumber pour player
+        - doit gerer les erreur et intergait avec l'utilisateur
+        - utilisation de while pour etre sur que les bateaux ont été placé
+        */
     }
 
     public int getShips() {
