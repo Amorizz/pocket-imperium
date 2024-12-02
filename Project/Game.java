@@ -8,7 +8,6 @@ public class Game {
     private static Game instance;
     private List<Player> players;
     private List<Round> rounds;
-    private static SectorCard[][] plateau = new SectorCard[3][3];
     private int currentRoundIndex;
     private String state;
     private static HashMap<String, ArrayList<SectorCard>> jeux;
