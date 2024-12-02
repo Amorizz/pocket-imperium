@@ -1,6 +1,8 @@
 package Project;
 
 import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class Game {
     private static Game instance;
@@ -32,8 +34,12 @@ public class Game {
     public void start() {
         if (players.size() > 1) {
             state = "in progress";
-            createRounds(5); // Par exemple, créer 5 rounds
-            startNextRound();
+            List<Color> availableColors = Arrays.asList(Color.values()); // Récupérer toutes les couleurs de l'énum
+            for (int i = 0; i < players.size(); i++) {
+                Color couleurJoueur = availableColors.get(i % availableColors.size()); // Assigner une couleur unique
+                players.get(i).setColor(couleurJoueur); // Méthode à ajouter pour définir la couleur
+            }
+            createRounds(9); // Par exemple, créer 5 rounds
         } else {
             System.out.println("Not enough players to start the game.");
         }
@@ -125,20 +131,24 @@ public class Game {
             for (int i = 0; i < nombreJoueurs; i++) {
                 System.out.println("Nom du joueur " + (i + 1) + " ?");
                 String nomJoueur = scanner.next();
-                game.addPlayer(new Player(0, nomJoueur, 0));
+                game.addPlayer(new Player(0, nomJoueur, 0)); // Utilisation de l'énum pour la couleur
             }
             game.start();
             System.out.println("État du jeu : " + game.getState());
-            System.out.println("Liste des joueurs : " + game.getPlayerNames());
-            
+            System.out.println("Liste des joueurs et leurs couleurs :");
+            for (Player player : game.getPlayers()) {
+                System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
+            }
             game.createRounds(9);
-            game.startNextRound();
+   
 
     
         }
         jeux = new HashMap<String, ArrayList<SectorCard>>();
         jeux = plateau();
         System.out.println(jeux.get("Mid").get(1).getHexa(3));
+
+        game.startNextRound();
 
     }
 }
