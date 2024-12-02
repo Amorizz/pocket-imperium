@@ -31,7 +31,7 @@ public class Game {
     }
 
     public void start() {
-        if (players.size() > 1) {
+        if (players.size() > 0) {
             state = "in progress";
             List<Color> availableColors = Arrays.asList(Color.values()); // Récupérer toutes les couleurs de l'énum
             for (int i = 0; i < players.size(); i++) {
@@ -138,7 +138,6 @@ public class Game {
             for (Player player : game.getPlayers()) {
                 System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
             }
-            game.createRounds(9);
    
 
     
@@ -147,7 +146,7 @@ public class Game {
         jeux = plateau();
         System.out.println(jeux.get("Mid").get(1).getHexa(3));
 
-        game.startNextRound();
+        //game.startNextRound();
 
     }
 }

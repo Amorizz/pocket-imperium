@@ -14,7 +14,12 @@ public class Hex {
     }
 
     public String toString(){
-        return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur"+occupation+" et son niveau est "+level;
+        if (this.occupation == null){
+            return "Cet hexagone est innocupé";
+        }
+        else{
+            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+        }
     }
 
     public void addShip(int number){
