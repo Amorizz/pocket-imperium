@@ -13,7 +13,7 @@ public class CommandCard {
         return this.id;
     }
 
-    private void expand(String playerColor, Hex hexDepart, Hex hexCible, boolean shipLeft) {
+    private void explore(String playerColor, Hex hexDepart, Hex hexCible, boolean shipLeft) {
         int nombreBateauxADeplacer = hexDepart.getShipon();
         if (shipLeft) {
             hexDepart.setShipon(1); // Laisse un bateaux sur l'hexa
@@ -170,7 +170,7 @@ public class CommandCard {
                 boolean shipLeft = reponse.equalsIgnoreCase("oui");
 
                 // Effectuer l'expansion
-                expand(playerColor, hexDepart, hexCible, shipLeft);
+                explore(playerColor, hexDepart, hexCible, shipLeft);
                 System.out.println("Expansion effectuée avec succès !");
             } catch (InputMismatchException e) {
                 System.out.println("Veuillez entrer un nombre valide !");
