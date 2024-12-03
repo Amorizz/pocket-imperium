@@ -8,6 +8,15 @@ public class SectorCard {
     private boolean triPrime;
     private boolean bottom;
     private boolean top;
+    private String occupation;
+
+    public String getOccupation() {
+        return occupation;
+    }
+
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
+    }
     private Map<Integer, Hex> Hexa;
 
     public ArrayList<Integer> position21(int nbr) {

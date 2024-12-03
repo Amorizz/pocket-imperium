@@ -20,11 +20,11 @@ public class Player {
         this.points += points;
     }
 
-    public int getShipNumber(){
+    public int getShipNumber() {
         return this.shipNumber;
     }
 
-    public void setShipNumber(int number){
+    public void setShipNumber(int number) {
         this.shipNumber = number;
     }
 
@@ -48,7 +48,8 @@ public class Player {
     public void chooseOrder() {
         List<CommandCard> order = new ArrayList<CommandCard>();
         while (order.size() < 3) {
-            System.out.println("Sélectionnez l'ordre d'exécution pour la carte " + (order.size() + 1) + " (ID de la carte entre 1 et 3) :");
+            System.out.println("Sélectionnez l'ordre d'exécution pour la carte " + (order.size() + 1)
+                    + " (ID de la carte entre 1 et 3) :");
             try {
                 int choix = scanner.nextInt(); // Utiliser un Scanner pour lire l'entrée de l'utilisateur
                 if (choix < 1 || choix > 3) {
@@ -56,7 +57,8 @@ public class Player {
                 } else {
                     CommandCard selectedCard = new CommandCard(choix - 1); // Créer une nouvelle carte avec l'ID choisi
                     if (order.contains(selectedCard)) { // Vérification de la carte déjà sélectionnée
-                        System.out.println("Erreur : Vous avez déjà sélectionné cette carte. Veuillez choisir un ID différent.");
+                        System.out.println(
+                                "Erreur : Vous avez déjà sélectionné cette carte. Veuillez choisir un ID différent.");
                     } else {
                         order.add(selectedCard); // Ajouter la carte sélectionnée à l'ordre
                     }
@@ -74,15 +76,14 @@ public class Player {
     }
 
     public void placeFirstShips() {
-        /*demande au joueur sur quel hexagone placer et cmb de bateaxu 
-        - verifie tout les critère :
-            - sector innocupé 
-            - l'hex est bien un system
-
-        - place les bateaux et addshipNumber pour player
-        - doit gerer les erreur et intergait avec l'utilisateur
-        - utilisation de while pour etre sur que les bateaux ont été placé
-        */
+        //affiche la liste des hex qui sont tel que secteur innocupé et lhex et un sys innocupé
+        // demande au joueur de choisir un des hex de la liste
+        // verifier que choix valide
+        //combien de bateaux
+        // - place les bateaux et addshipNumber pour player
+        // - doit gerer les erreur et intergait avec l'utilisateur
+        // - utilisation de while pour etre sur que les 2 bateaux ont été placé
+        //
     }
 
     public int getShips() {
@@ -96,6 +97,7 @@ public class Player {
     public List<CommandCard> getCards() {
         return new ArrayList<>(cards);
     }
+
     public List<Integer> getCardsId() {
         List<Integer> ids = new ArrayList<>();
         for (CommandCard card : cards) {
@@ -104,14 +106,16 @@ public class Player {
         return ids;
     }
 
-    /*public static void main(String[] args) {
-        Player joueur = new Player(5, "Jean-Pierre", 10);
-        joueur.placeShips(5); // Placer 5 vaisseaux
-        System.out.println("Nombre de vaisseaux du joueur : " + joueur.getShips());
-        System.out.println("Nom du joueur : " + joueur.getPlayerName());
-        joueur.chooseOrder(); // Sélectionner l'ordre des cartes
-        System.out.println("Cartes du joueur : " + joueur.getCardsId());
-        // Tester l'utilisation d'une carte
-        joueur.useCard(1);     }*/
+    /*
+     * public static void main(String[] args) {
+     * Player joueur = new Player(5, "Jean-Pierre", 10);
+     * joueur.placeShips(5); // Placer 5 vaisseaux
+     * System.out.println("Nombre de vaisseaux du joueur : " + joueur.getShips());
+     * System.out.println("Nom du joueur : " + joueur.getPlayerName());
+     * joueur.chooseOrder(); // Sélectionner l'ordre des cartes
+     * System.out.println("Cartes du joueur : " + joueur.getCardsId());
+     * // Tester l'utilisation d'une carte
+     * joueur.useCard(1); }
+     */
 
 }
