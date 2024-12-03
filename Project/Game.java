@@ -113,8 +113,9 @@ public class Game {
         }
 
         Plateau jeux = new Plateau();
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
-
+        System.out.println(jeux.getPlateau().get("Top").get(1).getHexa(4));
+        CommandCard co = new CommandCard(1);
+        System.out.println(co.getAdjacent(jeux.getPlateau().get("Top").get(1).getHexa(4), jeux.getPlateau()));
         //game.startNextRound();
 
     }

@@ -5,20 +5,22 @@ public class Hex {
     final int maxshipon;
     private String occupation;
     final int level;
+    private int number;
 
-    public Hex(int level) {
+    public Hex(int level, int number) {
         this.level = level;
         this.maxshipon = level+1;
         this.occupation = null;
         this.shipon = 0;
+        this.number = number;
     }
 
     public String toString(){
         if (this.occupation == null){
-            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level+" et son numero est "+this.number;
         }
         else{
-            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level+" et son numero est "+this.number;
         }
     }
 

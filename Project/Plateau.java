@@ -19,7 +19,13 @@ public class Plateau {
             SectorCard carteTop = new SectorCard(i, false, false, true);
             top.add(carteTop);
         }
+        // Dupliquer les cartes Doubles
         jeux.put("Top", top);
+        Hex PaT1 = jeux.get("Top").get(1).getHexa(3);
+        jeux.get("Top").get(0).getHex().put(5, PaT1);
+        Hex PaT2 = jeux.get("Top").get(2).getHexa(3);
+        jeux.get("Top").get(1).getHex().put(5, PaT2);
+
 
         // Création Carte Mid
         ArrayList<SectorCard> mid = new ArrayList<>();
@@ -27,6 +33,15 @@ public class Plateau {
         mid.add(new SectorCard(2, true, false, false));  // Carte TriPrime
         mid.add(new SectorCard(3, false, false, false)); // Carte Mid 2
         jeux.put("Mid", mid);
+        // Dupliquer les cartes Doubles
+        Hex PaMi1 = jeux.get("Mid").get(1).getHexa(1);
+        jeux.get("Mid").get(0).getHex().put(3, PaMi1);
+        Hex PaMi2 = jeux.get("Mid").get(1).getHexa(4);
+        jeux.get("Mid").get(0).getHex().put(8, PaMi2);
+        Hex PaMi3 = jeux.get("Mid").get(2).getHexa(1);
+        jeux.get("Mid").get(1).getHex().put(2, PaMi3);
+        Hex PaMi4 = jeux.get("Mid").get(2).getHexa(6);
+        jeux.get("Mid").get(1).getHex().put(5, PaMi4);
 
         // Création Carte Bottom
         ArrayList<SectorCard> bottom = new ArrayList<>();
@@ -35,6 +50,11 @@ public class Plateau {
             bottom.add(carteBottom);
         }
         jeux.put("Bottom", bottom);
+        // Dupliquer les cartes Doubles
+        Hex PaB1 = jeux.get("Bottom").get(1).getHexa(3);
+        jeux.get("Bottom").get(0).getHex().put(5, PaB1);
+        Hex PaB2 = jeux.get("Bottom").get(2).getHexa(3);
+        jeux.get("Bottom").get(1).getHex().put(5, PaB2);
     }
 
     public HashMap<String, ArrayList<SectorCard>> getPlateau() {
