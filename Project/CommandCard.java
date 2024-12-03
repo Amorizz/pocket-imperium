@@ -63,6 +63,8 @@ public class CommandCard {
 
     /*
      * private boolean isAdjacent(Hex hex1, Hex hex2) {
+     * on regarde si hex cible est dans la liste des hex adjacent de hexDepart
+     * ou autrrement avec les ids
      * }
      */
 
