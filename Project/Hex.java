@@ -8,7 +8,7 @@ public class Hex {
 
     public Hex(int level) {
         this.level = level;
-        this.maxshipon = level+1;
+        this.maxshipon = level + 1;
         this.occupation = null;
         this.shipon = 0;
     }
@@ -56,5 +56,6 @@ public class Hex {
     public int getLevel() {
         return level;
     }
+
 
 }
