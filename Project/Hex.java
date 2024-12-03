@@ -3,9 +3,8 @@ package Project;
 public class Hex {
     private int shipon;
     final int maxshipon;
-    private Player occupation;
+    private String occupation;
     final int level;
-    private String color;
 
     public Hex(int level) {
         this.level = level;
@@ -15,7 +14,12 @@ public class Hex {
     }
 
     public String toString(){
-        return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par "+occupation+" et son niveau est "+level;
+        if (this.occupation == null){
+            return "Cet hexagone est innocupé";
+        }
+        else{
+            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+        }
     }
 
     public void addShip(int number){
@@ -41,12 +45,12 @@ public class Hex {
         return maxshipon;
     }
 
-    public Player getOccupation() {
+    public String getOccupation() {
         return occupation;
     }
 
     public void setOccupation(String color) {
-        this.color = color;
+        this.occupation = color;
     }
 
     public int getLevel() {

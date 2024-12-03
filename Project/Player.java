@@ -1,6 +1,5 @@
 package Project;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,7 +10,7 @@ public class Player {
     private List<CommandCard> cards;
     private int points;
     private Scanner scanner;
-    /* private enum Color */
+    private String color;
 
     public int getPoints() {
         return points;
@@ -35,6 +34,15 @@ public class Player {
         this.cards = new ArrayList<CommandCard>();
         this.points = points;
         this.scanner = new Scanner(System.in);
+        this.color = null;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color.getColorName();
     }
 
     public void chooseOrder() {
