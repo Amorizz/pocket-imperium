@@ -5,6 +5,7 @@ public class Hex {
     final int maxshipon;
     private String occupation;
     final int level;
+    
 
     public Hex(int level) {
         this.level = level;
