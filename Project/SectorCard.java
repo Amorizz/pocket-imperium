@@ -8,6 +8,15 @@ public class SectorCard {
     private boolean triPrime;
     private boolean bottom;
     private boolean top;
+    private String occupation;
+
+    public String getOccupation() {
+        return occupation;
+    }
+
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
+    }
     private Map<Integer, Hex> Hexa;
 
     public ArrayList<Integer> position21(int nbr) {
@@ -28,38 +37,38 @@ public class SectorCard {
         if (this.bottom || this.top) {              // Création des Hexagons dans la carte secteur si c'est une carte bottom ou top
             ArrayList<Integer> LNBR = position21(7);
             for (int i = 0;i<7;i++){
-                Hex Hex1 = new Hex(0,i+1);
+                Hex Hex1 = new Hex(0);
                 this.Hexa.put(i+1, Hex1);
             }
-            Hex Hex2 = new Hex(2,LNBR.get(0));
+            Hex Hex2 = new Hex(2);
             this.Hexa.put(LNBR.get(0), Hex2);
-            Hex Hex11 = new Hex(1,LNBR.get(1));
+            Hex Hex11 = new Hex(1);
             this.Hexa.put(LNBR.get(1), Hex11);
-            Hex Hex12 = new Hex(1,LNBR.get(2));
+            Hex Hex12 = new Hex(1);
             this.Hexa.put(LNBR.get(2), Hex12);
         } else if (!this.bottom && !this.top && !this.triPrime) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
             ArrayList<Integer> LNBR = position21(8);
             for (int i = 0;i<8;i++){
-                Hex Hex1 = new Hex(0,i+1);
+                Hex Hex1 = new Hex(0);
                 this.Hexa.put(i+1, Hex1);
             }
-            Hex Hex2 = new Hex(2,LNBR.get(0));
+            Hex Hex2 = new Hex(2);
             this.Hexa.put(LNBR.getFirst(), Hex2);
-            Hex Hex11 = new Hex(1,LNBR.get(1));
+            Hex Hex11 = new Hex(1);
             this.Hexa.put(LNBR.get(1), Hex11);
-            Hex Hex12 = new Hex(1,LNBR.get(2));
+            Hex Hex12 = new Hex(1);
             this.Hexa.put(LNBR.get(2), Hex12);
         } else if (this.triPrime){                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
             Random randomNumbers = new Random();
-            Hex Hex1 = new Hex(0,1);
+            Hex Hex1 = new Hex(0);
             this.Hexa.put(1, Hex1);
-            Hex Hex2 = new Hex(0,2);
+            Hex Hex2 = new Hex(0);
             this.Hexa.put(2, Hex2);
-            Hex HexTri = new Hex(3,3);
+            Hex HexTri = new Hex(3);
             this.Hexa.put(3,HexTri);
-            Hex Hex3 = new Hex(0,4);
+            Hex Hex3 = new Hex(0);
             this.Hexa.put(4, Hex3);
-            Hex Hex4 = new Hex(0,5);
+            Hex Hex4 = new Hex(0);
             this.Hexa.put(5, Hex4);
         }
     }

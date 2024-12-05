@@ -61,45 +61,15 @@ public class CommandCard {
         }
     }
 
-    /*
-     * private boolean isAdjacent(Hex hex1, Hex hex2) {
-     * }
-     */
+    // private boolean isAdjacent(Hex hex1, Hex hex2) {
+    // on regarde si hex cible est dans la liste des hex adjacent de hexDepart
+    // ou autrrement avec les ids
 
-    // Renvoie la liste des hexagones adjacents à un hexagone donné
-    public List<Hex> getAdjacent(Hex targetHex, HashMap<String, ArrayList<SectorCard>> plateau) {
-        List<Hex> adjacents = new ArrayList<>();
-
-        // Parcourir le plateau pour trouver les hexagones adjacents
-        for (String niveau : plateau.keySet()) {
-            ArrayList<SectorCard> secteurs = plateau.get(niveau);
-            for (SectorCard sector : secteurs) {
-                Map<Integer, Hex> hexagones = sector.getHex();
-
-                // Identifier l'adjacence par indices
-                for (Map.Entry<Integer, Hex> entry : hexagones.entrySet()) {
-                    int index = entry.getKey();
-                    Hex hex = entry.getValue();
-
-                    if (hex.equals(targetHex)) {
-                        // Ajouter les hexagones adjacents (index précédent et suivant)
-                        if (hexagones.containsKey(index - 1)) {
-                            adjacents.add(hexagones.get(index - 1));
-                        }
-                        if (hexagones.containsKey(index + 1)) {
-                            adjacents.add(hexagones.get(index + 1));
-                        }
-                    }
-                }
-            }
-        }
-
-        return adjacents;
-    }
+    //}
 
     public void executeCard(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau) {
         if (this.id == 0) { // expand // Il ne faut pas qu'on ajoute un nombre de ship max par joueur ? :
-                            // non cest a la fin du tour
+            // non cest a la fin du tour
             try (Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesJoueur = new ArrayList<>();
 
@@ -208,7 +178,7 @@ public class CommandCard {
             }
         } else {
             try (// invade
-                    Scanner scanner = new Scanner(System.in)) {
+                 Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesCibles = new ArrayList<>();
 
                 // Parcours Plateau
