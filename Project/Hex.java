@@ -8,18 +8,20 @@ public class Hex {
 
     public Hex(int level) {
         this.level = level;
-        this.maxshipon = level+1;
+        this.maxshipon = level + 1;
         this.occupation = null;
         this.shipon = 0;
     }
 
     public String toString(){
-        if (this.occupation == null){
-            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+        String string;
+        if (shipon == 0){
+            string = "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
         }
         else{
-            return "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+            string = "Cet Hexagone est innocupé";
         }
+        return string;
     }
 
     public void addShip(int number){
@@ -56,5 +58,6 @@ public class Hex {
     public int getLevel() {
         return level;
     }
+
 
 }
