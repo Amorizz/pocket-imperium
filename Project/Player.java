@@ -71,19 +71,54 @@ public class Player {
         this.cards = order; // Mettre à jour la liste des cartes du joueur
     }
 
-    public void useCard(int cardId) {
 
+        private List<Hex> getAvailableHexes() {
+        //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
+        return null;
+        
     }
 
     public void placeFirstShips() {
-        //affiche la liste des hex qui sont tel que secteur innocupé et lhex et un sys innocupé
-        // demande au joueur de choisir un des hex de la liste
-        // verifier que choix valide
-        //combien de bateaux
-        // - place les bateaux et addshipNumber pour player
-        // - doit gerer les erreur et intergait avec l'utilisateur
-        // - utilisation de while pour etre sur que les 2 bateaux ont été placé
-        //
+        List<Hex> availableHexes = getAvailableHexes(); // Méthode pour obtenir les hexagones disponibles
+        try (Scanner scanner = new Scanner(System.in)) { // Utilisation de try-with-resources
+            int shipsToPlace = 2; // Nombre de bateaux à placer
+            int placedShips = 0;
+
+            while (placedShips < shipsToPlace) {
+                System.out.println("Choisissez un hexagone parmi les suivants :");
+                for (int i = 0; i < availableHexes.size(); i++) {
+                    System.out.println((i + 1) + ". " + availableHexes.get(i));
+                }
+
+                int choix = -1;
+                while (choix < 1 || choix > availableHexes.size()) {
+                    System.out.print("Votre choix (1-" + availableHexes.size() + ") : ");
+                    choix = scanner.nextInt();
+                    if (choix < 1 || choix > availableHexes.size()) {
+                        System.out.println("Choix invalide, veuillez réessayer.");
+                    }
+                }
+
+                Hex selectedHex = availableHexes.get(choix - 1);
+                if (selectedHex.getShipon() < selectedHex.getMaxshipon()) {
+                    selectedHex.addShip(1); // Ajouter un bateau à l'hexagone
+                    selectedHex.setOccupation(this.color); // Marquer l'hexagone comme occupé par la couleur du joueur
+                    /*int sectorNumber = selectedHex.getSectorNumber();
+                     SectorCard sector = getSectorByNumber(sectorNumber);
+                     if (sector != null) {
+                         sector.setOccupation(this.color);
+                     }*/
+                    placedShips++;
+                    this.shipNumber++; // Augmenter le nombre de bateaux du joueur
+                    System.out.println("Bateau placé sur " + selectedHex);
+                } else {
+                    System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
+                }
+            }
+
+            this.shipNumber += shipsToPlace; // Mettre à jour le nombre de bateaux du joueur
+            System.out.println("Tous les bateaux ont été placés.");
+        }
     }
 
     public int getShips() {
@@ -105,6 +140,8 @@ public class Player {
         }
         return ids;
     }
+
+
 
     /*
      * public static void main(String[] args) {
