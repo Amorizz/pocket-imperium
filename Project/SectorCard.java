@@ -9,6 +9,7 @@ public class SectorCard {
     private boolean bottom;
     private boolean top;
     private String occupation;
+    private Map<Integer, Hex> Hexa;
 
     public String getOccupation() {
         return occupation;
@@ -17,7 +18,6 @@ public class SectorCard {
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
-    private Map<Integer, Hex> Hexa;
 
     public ArrayList<Integer> position21(int nbr) {
         Set<Integer> uniquePositions = new HashSet<>();
@@ -29,7 +29,6 @@ public class SectorCard {
     }
 
     public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
-        System.out.println(triPrime);
         this.number = number;
         this.triPrime = triPrime;
         this.bottom = bottom;
@@ -92,6 +91,15 @@ public class SectorCard {
 
     public Hex getHexa(int nbr){
         return Hexa.get(nbr);
+    }
+
+    public Hex getHex(int nx, int ny) {
+        for (Hex hex : Hexa.values()) {
+            if (hex.getX() == nx && hex.getY() == ny) {
+                return hex;
+            }
+        }
+        return null; // Aucun hexagone trouvé aux coordonnées données
     }
 
     public Map<Integer, Hex> getHex() {

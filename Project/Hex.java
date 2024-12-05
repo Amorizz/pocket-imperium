@@ -1,5 +1,10 @@
 package Project;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Hex {
     private int x;
     private int y;
@@ -18,7 +23,6 @@ public class Hex {
 
     public void reLoc(boolean triPrime, boolean bottom, boolean top, int place, int number){    // Cette fonction sert a trouver le x et le y
         if (triPrime) {
-            System.out.println("dedans chef");
             //code
             this.y = 4;
             this.x = 3;
@@ -81,7 +85,6 @@ public class Hex {
         }
     }
 
-
     public int getX() {
         return x;
     }
@@ -93,7 +96,7 @@ public class Hex {
     public String toString(){
         String string;
         if (shipon == 0){
-            string = "Cet Hexagone contient "+shipon+" bateau sur "+maxshipon+" il est occupé par le joueur de couleur "+occupation+" et son niveau est "+level;
+            string = "X : "+this.x+" Y : "+this.y+" level : "+this.level;
         }
         else{
             string = "Cet Hexagone est innocupé";
@@ -136,5 +139,31 @@ public class Hex {
         return level;
     }
 
+    public List<Hex> rexAdjacent(HashMap<String, ArrayList<SectorCard>> plateau) {
+        List<Hex> adjacents = new ArrayList<>();
 
+        // Offsets des voisins en fonction de la parité de y
+        int[][] offsets = (y % 2 == 0)
+                ? new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, +1}, {-1, -1}}
+                : new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {1, +1}, {1, -1}};
+
+        // Parcourir chaque niveau et chaque SectorCard
+        for (String niveau : plateau.keySet()) {
+            ArrayList<SectorCard> sectors = plateau.get(niveau);
+
+            for (SectorCard sector : sectors) {
+                for (int[] offset : offsets) {
+                    int nx = x + offset[0];
+                    int ny = y + offset[1];
+
+                    // Chercher l'hexagone correspondant dans le sector
+                    Hex adjacentHex = sector.getHex(nx, ny);
+                    if (adjacentHex != null && !adjacents.contains(adjacentHex)) {
+                        adjacents.add(adjacentHex);
+                    }
+                }
+            }
+        }
+        return adjacents;
+    }
 }

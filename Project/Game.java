@@ -116,5 +116,6 @@ public class Game {
         System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
         System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).getX());
         System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).getY());
+        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).rexAdjacent(jeux.getPlateau()));
     }
 }
