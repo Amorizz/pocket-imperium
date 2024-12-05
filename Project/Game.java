@@ -10,7 +10,6 @@ public class Game {
     private List<Round> rounds;
     private int currentRoundIndex;
     private String state;
-    private static HashMap<String, ArrayList<SectorCard>> jeux;
 
     private Game() {
         players = new ArrayList<>();
@@ -38,7 +37,7 @@ public class Game {
                 Color couleurJoueur = availableColors.get(i % availableColors.size()); // Assigner une couleur unique
                 players.get(i).setColor(couleurJoueur); // Méthode à ajouter pour définir la couleur
             }
-            createRounds(9); // Par exemple, créer 5 rounds
+            createRounds(9); // Par exemple, créer rounds
         } else {
             System.out.println("Not enough players to start the game.");
         }
@@ -107,16 +106,13 @@ public class Game {
             for (Player player : game.getPlayers()) {
                 System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
             }
-   
 
-    
         }
 
         Plateau jeux = new Plateau();
         System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
 
-        //game.startNextRound();
-
+        game.startNextRound();
+        jeux.afficherPlateau();
     }
 }
-
