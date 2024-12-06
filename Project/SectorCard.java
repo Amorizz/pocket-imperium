@@ -20,11 +20,22 @@ public class SectorCard {
     }
 
     public ArrayList<Integer> position21(int nbr) {
+        if (nbr < 3) {
+            throw new IllegalArgumentException("Le nombre d'hexagones doit être au moins 3.");
+        }
+
         Set<Integer> uniquePositions = new HashSet<>();
         Random random = new Random();
+
+        // Générer 3 indices uniques valides
         while (uniquePositions.size() < 3) {
-            uniquePositions.add(random.nextInt(nbr) + 1); // +1 pour éviter l'index 0
+            int generated = random.nextInt(nbr) + 1; // Générer un indice entre 1 et nbr inclus
+            if (generated <= nbr) { // Vérification explicite des limites
+                uniquePositions.add(generated);
+            }
         }
+
+        System.out.println("Indices générés : " + uniquePositions);
         return new ArrayList<>(uniquePositions);
     }
 

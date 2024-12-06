@@ -108,8 +108,8 @@ public class Game {
         }
 
         Plateau jeux = new Plateau();
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
-
+        System.out.println(jeux.getPlateau().get("Top").get(1).getHexa(4));
+        System.out.println(jeux.getPlateau().get("Top").get(1).getHexa(4).rexAdjacent(jeux.getPlateau()));
         game.startNextRound();
         jeux.afficherPlateau();
     }
