@@ -72,10 +72,10 @@ public class Player {
     }
 
 
-    private List<Hex> getAvailableHexes() {
+        private List<Hex> getAvailableHexes() {
         //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
         return null;
-
+        
     }
 
     public void placeFirstShips() {

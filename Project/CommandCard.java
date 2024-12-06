@@ -61,11 +61,6 @@ public class CommandCard {
         }
     }
 
-    // private boolean isAdjacent(Hex hex1, Hex hex2) {
-    // on regarde si hex cible est dans la liste des hex adjacent de hexDepart
-    // ou autrrement avec les ids
-
-    //}
 
     public void executeCard(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau) {
         if (this.id == 0) { // expand // Il ne faut pas qu'on ajoute un nombre de ship max par joueur ? :
@@ -147,7 +142,7 @@ public class CommandCard {
                     for (SectorCard sector : secteurs) {
                         Map<Integer, Hex> hexagones = sector.getHex();
                         for (Hex hex : hexagones.values()) {
-                            if (hex.getOccupation() == null /* && isAdjacent(hexDepart, hex) */) {
+                            if (hex.getOccupation() == null && hexDepart.isAdjacent(hex, plateau)) {
                                 hexagonesCibles.add(hex);
                             }
                         }

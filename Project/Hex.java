@@ -12,6 +12,7 @@ public class Hex {
     final int maxshipon;
     private String occupation;
     final int level;
+    
 
 
     public Hex(int level) {
@@ -83,6 +84,7 @@ public class Hex {
                 this.x++;
             }
         }
+        return string;
     }
 
     public int getX() {
@@ -165,5 +167,22 @@ public class Hex {
             }
         }
         return adjacents;
+    }
+
+    public boolean isAdjacent(Hex other, HashMap<String, ArrayList<SectorCard>> plateau) {
+        List<Hex> adjacentHexes = this.rexAdjacent(plateau); // Obtenir les hexagones adjacents
+        if (adjacentHexes.contains(other)) {
+            return true; // Adjacent directement
+        }
+
+        // Vérifier si l'autre hexagone est adjacent à l'un des hexagones adjacents
+        for (Hex hex : adjacentHexes) {
+            List<Hex> secondAdjacentHexes = hex.rexAdjacent(plateau);
+            if (secondAdjacentHexes.contains(other)) {
+                return true; // Adjacent à 2 hexagones
+            }
+        }
+
+        return false; // Pas adjacent
     }
 }
