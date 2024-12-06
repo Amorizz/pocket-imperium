@@ -12,6 +12,7 @@ public class Hex {
     final int maxshipon;
     private String occupation;
     final int level;
+    
 
 
     public Hex(int level) {
@@ -83,6 +84,7 @@ public class Hex {
                 this.x++;
             }
         }
+        return string;
     }
 
     public int getX() {
