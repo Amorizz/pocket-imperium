@@ -1,8 +1,6 @@
 package Project;
 
 import java.util.*;
-import java.util.Arrays;
-import java.util.List;
 
 public class Game {
     private static Game instance;
@@ -113,9 +111,5 @@ public class Game {
 
         game.startNextRound();
         jeux.afficherPlateau();
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).getX());
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).getY());
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3).rexAdjacent(jeux.getPlateau()));
     }
 }
