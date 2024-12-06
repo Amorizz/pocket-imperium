@@ -20,7 +20,7 @@ public class Round {
 
     public void stopRound() {
         System.out.println("Round " + roundNumber + " ended.");
-      
+
         // Logique pour terminer le tour
     }
 

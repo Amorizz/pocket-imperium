@@ -1,8 +1,6 @@
 package Project;
 
 import java.util.*;
-import java.util.Arrays;
-import java.util.List;
 
 public class Game {
     private static Game instance;
