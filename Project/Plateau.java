@@ -31,6 +31,11 @@ public class Plateau {
             jeux.put("sector" +i, new SectorCard(i, false));
         }
 
+        //il faut maintenant parcourir chaque sector card ligne par ligne
+            //si hex == null alors on passe auprochain 
+            //sinon on ajoute dans la geante matrice qui est le plateau lhex est on attribue ces coordonnee 
+            
+
     }
 
     public HashMap<String, SectorCard> getPlateau() {
@@ -38,6 +43,6 @@ public class Plateau {
     }
 
     public void afficherPlateau() {
-        
+
     }
 }
