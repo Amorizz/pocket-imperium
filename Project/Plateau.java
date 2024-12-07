@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class Plateau {
 
-    private HashMap<String, ArrayList<SectorCard>> jeux;
+    private HashMap<String, SectorCard> jeux;
 
     public Plateau() {
         this.jeux = new HashMap<>();
@@ -13,41 +13,31 @@ public class Plateau {
     }
 
     private void initialiserPlateau() {
-        // Création Carte Top
-        ArrayList<SectorCard> top = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            SectorCard carteTop = new SectorCard(i+1, false, false, true);
-            top.add(carteTop);
+        HashMap<String, SectorCard> jeux = new HashMap<>();
+        for (int i = 1; i <= 3; i++) {
+            jeux.put("sector" + i, new SectorCard(i, false));
         }
-        jeux.put("Top", top);
 
-        // Création Carte Mid
-        ArrayList<SectorCard> mid = new ArrayList<>();
-        mid.add(new SectorCard(1, false, false, false)); // Carte Mid 1
-        mid.add(new SectorCard(2, true, false, false));  // Carte TriPrime
-        mid.add(new SectorCard(3, false, false, false)); // Carte Mid 2
-        jeux.put("Mid", mid);
+        for (int i = 4; i <= 6; i++) {
 
-        // Création Carte Bottom
-        ArrayList<SectorCard> bottom = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            SectorCard carteBottom = new SectorCard(i+1, false, true, false);
-            bottom.add(carteBottom);
+            if (i == 5) {
+                jeux.put("sector5", new SectorCard(i, true));
+            } else {
+                jeux.put("sector" + i, new SectorCard(i, false));
+            }
         }
-        jeux.put("Bottom", bottom);
+
+        for (int i = 7; i <= 9; i++) {
+            jeux.put("sector" +i, new SectorCard(i, false));
+        }
+
     }
 
-    public HashMap<String, ArrayList<SectorCard>> getPlateau() {
+    public HashMap<String, SectorCard> getPlateau() {
         return this.jeux;
     }
 
     public void afficherPlateau() {
-        for (String niveau : jeux.keySet()) {
-            System.out.println("Niveau : " + niveau);
-            ArrayList<SectorCard> sectors = jeux.get(niveau);
-            for (SectorCard sector : sectors) {
-                System.out.println("  " + sector);
-            }
-        }
+        
     }
 }

@@ -4,12 +4,47 @@ import java.util.*;
 
 public class SectorCard {
     private int number;
-    private int position = 0;
     private boolean triPrime;
-    private boolean bottom;
-    private boolean top;
     private String occupation;
-    private Map<Integer, Hex> Hexa;
+    private Hex[][] hexagones;
+
+    public SectorCard(int number, boolean triPrime) {
+        this.number = number;
+        this.triPrime = triPrime;
+
+        if (triPrime) {
+            this.hexagones = new Hex[1][1];
+            Hex hex = new Hex(3, 5);
+            this.hexagones[0][0] = hex;
+        } else {
+            if (number == 2 || number == 8) {
+                this.hexagones = new Hex[3][3];
+                List<Hex> hexList = new ArrayList<>();
+                hexList.add(new Hex(2, number));
+                hexList.add(new Hex(1, number));
+                hexList.add(new Hex(1, number));
+
+                // Mélanger la liste des hexagones
+                Collections.shuffle(hexList);
+
+                // Remplir la matrice avec les hexagones mélangés
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+
+                        if (i!=)
+                        this.hexagones[i][j] = hexList.remove(0);
+                    }
+                }
+            } else {
+                this.hexagones = new Hex[3][3];
+                // Autres cas à gérer ici
+            }
+        }
+    }
+
+    public Map<Integer, Hex> getHex() {
+        return null;
+    }
 
     public String getOccupation() {
         return occupation;
@@ -19,101 +54,16 @@ public class SectorCard {
         this.occupation = occupation;
     }
 
-    public ArrayList<Integer> position21(int nbr) {
-        if (nbr < 3) {
-            throw new IllegalArgumentException("Le nombre d'hexagones doit être au moins 3.");
-        }
-
-        Set<Integer> uniquePositions = new HashSet<>();
-        Random random = new Random();
-
-        // Générer 3 indices uniques valides
-        while (uniquePositions.size() < 3) {
-            int generated = random.nextInt(nbr) + 1; // Générer un indice entre 1 et nbr inclus
-            if (generated <= nbr) { // Vérification explicite des limites
-                uniquePositions.add(generated);
-            }
-        }
-
-        System.out.println("Indices générés : " + uniquePositions);
-        return new ArrayList<>(uniquePositions);
+    public String toString() {
+        return "";
     }
 
-    public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
-        this.number = number;
-        this.triPrime = triPrime;
-        this.bottom = bottom;
-        this.top = top;
-        this.Hexa = new HashMap<Integer, Hex>();    // Les hexagones seront ajouté dans une map (dictionnaire)
-        if (this.bottom || this.top) {              // Création des Hexagons dans la carte secteur si c'est une carte bottom ou top
-            ArrayList<Integer> LNBR = position21(7);
-            for (int i = 0;i<7;i++){
-                Hex Hex1 = new Hex(0);
-                this.Hexa.put(i+1, Hex1);
-                Hex1.reLoc(triPrime,bottom,top,i,number);
-            }
-            Hex Hex2 = new Hex(2);
-            this.Hexa.put(LNBR.get(0), Hex2);
-            Hex2.reLoc(triPrime,bottom,top,LNBR.get(0),number);
-            Hex Hex11 = new Hex(1);
-            this.Hexa.put(LNBR.get(1), Hex11);
-            Hex11.reLoc(triPrime,bottom,top, LNBR.get(1), number);
-            Hex Hex12 = new Hex(1);
-            this.Hexa.put(LNBR.get(2), Hex12);
-            Hex12.reLoc(triPrime,bottom,top, LNBR.get(2), number);
-        } else if (!this.bottom && !this.top && !this.triPrime) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
-            ArrayList<Integer> LNBR = position21(8);
-            for (int i = 0;i<8;i++){
-                Hex Hex1 = new Hex(0);
-                this.Hexa.put(i+1, Hex1);
-                Hex1.reLoc(triPrime,bottom,top,i,number);
-            }
-            Hex Hex2 = new Hex(2);
-            this.Hexa.put(LNBR.getFirst(), Hex2);
-            Hex2.reLoc(triPrime,bottom,top, LNBR.getFirst(), number);
-            Hex Hex11 = new Hex(1);
-            this.Hexa.put(LNBR.get(1), Hex11);
-            Hex11.reLoc(triPrime,bottom,top, LNBR.get(1), number);
-            Hex Hex12 = new Hex(1);
-            this.Hexa.put(LNBR.get(2), Hex12);
-            Hex12.reLoc(triPrime,bottom,top,LNBR.get(2),number);
-        } else if (this.triPrime){                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
-            Hex Hex1 = new Hex(0);
-            this.Hexa.put(1, Hex1);
-            Hex1.reLoc(triPrime,bottom,top,1,number);
-            Hex Hex2 = new Hex(0);
-            this.Hexa.put(2, Hex2);
-            Hex2.reLoc(triPrime,bottom,top,2,number);
-            Hex HexTri = new Hex(3);
-            this.Hexa.put(3,HexTri);
-            HexTri.reLoc(triPrime,bottom,top,3,number);
-            Hex Hex3 = new Hex(0);
-            this.Hexa.put(4, Hex3);
-            Hex3.reLoc(triPrime,bottom,top,4,number);
-            Hex Hex4 = new Hex(0);
-            this.Hexa.put(5, Hex4);
-            Hex4.reLoc(triPrime,bottom,top,5,number);
-        }
-    }
-
-    public String toString(){
-        return "Cette carte contient "+Hexa.size()+" Hexagone";
-    }
-
-    public Hex getHexa(int nbr){
-        return Hexa.get(nbr);
+    public Hex getHexa(int nbr) {
+        return null;
     }
 
     public Hex getHex(int nx, int ny) {
-        for (Hex hex : Hexa.values()) {
-            if (hex.getX() == nx && hex.getY() == ny) {
-                return hex;
-            }
-        }
-        return null; // Aucun hexagone trouvé aux coordonnées données
+        return hexagones[nx][ny];
     }
 
-    public Map<Integer, Hex> getHex() {
-        return this.Hexa;
-    }
 }
