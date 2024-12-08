@@ -21,69 +21,53 @@ public class Hex {
 
     public void reLoc(boolean triPrime, boolean bottom, boolean top, int place, int number) {
         if (triPrime) {
-            // Initialisation pour la carte TriPrime
-            this.x = 3;
-            this.y = 4;
-
-            for (int i = 0; i < place; i++) {
-                // Déplacement des hexagones dans la carte TriPrime
-                if (this.y == 4 && this.x == 5) {
-                    this.y += 1;
-                    this.x = 2;
-                }
-                if (this.y == 5 && this.x == 4) {
-                    this.y += 1;
-                    this.x = 2;
-                }
-                this.x++;
+            System.out.println("C'est le TriPri");
+            // Gestion de la carte TriPrime (hexagones spécifiques)
+            int baseX = 3;
+            int baseY = 4;
+            if (place == 3){
+                this.x = baseX;
+                this.y = baseY+1;
+            } else if (place <= 2){
+                this.x = baseX + (place - 1);
+                this.y = baseY;
+            } else {
+                this.x = baseX + (place - 4);
+                this.y = baseY + 2;
             }
         } else if (bottom || top) {
-            // Initialisation pour les cartes Bottom et Top
-            this.x = 1 + 2 * number - 2;
-            this.y = (top) ? 1 : 7;  // Y=7 pour les cartes top, Y=1 pour les cartes bottom
+            // Gestion des cartes Top et Bottom
+            int baseX = 1 + (number - 1) * 2; // Décalage horizontal pour chaque carte
+            int baseY = top ? 1 : 7;          // Niveau de départ (7 pour top, 1 pour bottom)
 
-            for (int i = 0; i < place; i++) {
-                // Vérification des positions spécifiques pour bottom et top
-                if ((this.x == 1 + 2 * number && (this.y == 1 || this.y == 7))) {
-                    this.y++;
-                    this.x = 2 * number - 2;
-                }
-                if ((this.x == 2 + 2 * number && (this.y == 2 || this.y == 8))) {
-                    this.y++;
-                    this.x = 2 * number - 2;
-                }
-                this.x++;
+            if (place < 2) { // Ligne 1 (2 hexagones)
+                this.x = baseX + place;
+                this.y = baseY;
+            } else if (place < 5) { // Ligne 2 (3 hexagones)
+                this.x = baseX + (place - 2);
+                this.y = baseY + 1;
+            } else { // Ligne 3 (2 hexagones)
+                this.x = baseX + (place - 5);
+                this.y = baseY + 2;
             }
         } else {
-            // Initialisation pour les cartes qui ne sont ni bottom ni top (par exemple, mid)
-            this.y = 4;
-            if (number == 1) {
-                this.x = 1;
-                // Gestion spécifique des indices
-                if (this.x == 4 && this.y == 4) {
-                    this.y++;
-                    this.x = 0;
-                }
-                if (this.x == 3 && this.y == 5) {
-                    this.y++;
-                    this.x = 0;
-                }
-                this.x++;
-            } else if (number == 3) {
-                this.x = 4;
-                // Gestion des indices pour number == 3
-                if (this.x == 7 && this.y == 4) {
-                    this.y++;
-                    this.x = 3;
-                }
-                if (this.x == 6 && this.y == 5) {
-                    this.y++;
-                    this.x = 3;
-                }
-                this.x++;
+            // Gestion des cartes Mid
+            int baseX = (number == 1) ? 1 : 4; // Décalage horizontal pour Mid 1 ou Mid 3
+            int baseY = 4;                     // Niveau de départ pour Mid
+
+            if (place < 3) { // Ligne 1 (3 hexagones)
+                this.x = baseX + place;
+                this.y = baseY;
+            } else if (place < 5) { // Ligne 2 (2 hexagones)
+                this.x = baseX + (place - 3);
+                this.y = baseY + 1;
+            } else { // Ligne 3 (3 hexagones)
+                this.x = baseX + (place - 5);
+                this.y = baseY + 2;
             }
         }
-        System.out.println("Hex placé : x=" + this.x + ", y=" + this.y);  // Affichage pour débogage
+
+        System.out.println("Hex placé : x=" + this.x + ", y=" + this.y);
     }
 
     public int getX() {
@@ -142,43 +126,90 @@ public class Hex {
 
     public List<Hex> rexAdjacent(HashMap<String, ArrayList<SectorCard>> plateau) {
         List<Hex> adjacents = new ArrayList<>();
-        Set<String> addedCoords = new HashSet<>();  // Utiliser un set pour éviter les doublons
+        Set<String> addedCoords = new HashSet<>();
 
         // Offsets des voisins en fonction de la parité de y
         int[][] offsets = (y % 2 == 0)
                 ? new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {-1, -1}}
                 : new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {1, 1}, {1, -1}};
 
-        // Parcours des offsets et recherche des hexagones adjacents
+        // Ajout d'offsets supplémentaires si l'hexagone est celui de TriPrime (3, 5)
+        if (x == 3 && y == 5) {
+            System.out.println("Hexagone central de TriPrime détecté : (3, 5). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {-1, -1}, {1, 1}, {1, -1}, {0, 2}, {0, -2}
+            };
+        }
+        // Cas spécifique : Hexagone (3, 4) et (3, 6)
+        else if (x == 3 && (y == 4 || y == 6)) {
+            System.out.println("Hexagone spécifique détecté : (3, 4). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {0, -1}, {0, 1}, {-1, 1}, {-1, -1}
+            };
+        }
+        // Cas spécifique : Hexagone (4, 4) et (4,6)
+        else if (x == 4 && (y == 4 || y == 6)) {
+            System.out.println("Hexagone spécifique détecté : (4, 4). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {1, 0}, {0, -1}, {0, 1}, {-1, 1}, {-1, -1}
+            };
+        }
+        // Cas spécifique : Hexagone (3, 3)
+        else if (x == 3 && y == 3) {
+            System.out.println("Hexagone spécifique détecté : (3, 3). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {0, 2}, {1, -1}
+            };
+        }
+        // Cas spécifique : Hexagone (4, 3)
+        else if (x == 4 && y == 3) {
+            System.out.println("Hexagone spécifique détecté : (4, 3). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, 2}, {1, -1}
+            };
+        }
+        // Cas spécifique : Hexagone (3, 7)
+        else if (x == 3 && y == 7) {
+            System.out.println("Hexagone spécifique détecté : (3, 7). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {1, 1}, {0, -2}
+            };
+        }
+        // Cas spécifique : Hexagone (4, 7)
+        else if (x == 4 && y == 7) {
+            System.out.println("Hexagone spécifique détecté : (4, 7). Recherche de voisins spécifiques.");
+            offsets = new int[][]{
+                    {-1, 0}, {1, 0}, {-1, -2}, {0, 1}, {1, 1}, {0, -1}
+            };
+        }
+
+
+        // Parcourir les offsets pour chercher les voisins
         for (int[] offset : offsets) {
             int nx = x + offset[0];
             int ny = y + offset[1];
-
             System.out.println("Recherche voisin : nx=" + nx + ", ny=" + ny);
 
-            boolean found = false;
+            boolean voisinTrouve = false;
 
-            // Parcourir chaque niveau et chaque SectorCard
+            // Parcourir tous les secteurs du plateau
             for (String niveau : plateau.keySet()) {
                 ArrayList<SectorCard> sectors = plateau.get(niveau);
-
                 for (SectorCard sector : sectors) {
-                    // Vérification que l'hexagone est présent dans la sectorCard
-                    Hex adjacentHex = sector.getHex(nx, ny);
-
-                    if (adjacentHex != null) {
-                        String coords = nx + "," + ny;  // Utilisation des coordonnées comme clé pour éviter les doublons
+                    Hex voisin = sector.getHex(nx, ny);
+                    if (voisin != null) {
+                        voisinTrouve = true;
+                        String coords = nx + "," + ny;
                         if (!addedCoords.contains(coords)) {
-                            adjacents.add(adjacentHex);
-                            addedCoords.add(coords);  // Ajouter les coordonnées à la liste des déjà ajoutés
-                            found = true;
-                            System.out.println("Hexagone ajouté : " + adjacentHex);
+                            adjacents.add(voisin);
+                            addedCoords.add(coords);
+                            System.out.println("Hexagone ajouté : " + voisin);
                         }
                     }
                 }
             }
 
-            if (!found) {
+            if (!voisinTrouve) {
                 System.out.println("Aucun hexagone trouvé aux coordonnées nx=" + nx + ", ny=" + ny);
             }
         }

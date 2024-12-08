@@ -45,38 +45,47 @@ public class SectorCard {
         this.bottom = bottom;
         this.top = top;
         this.Hexa = new HashMap<Integer, Hex>();    // Les hexagones seront ajouté dans une map (dictionnaire)
-        if (this.bottom || this.top) {              // Création des Hexagons dans la carte secteur si c'est une carte bottom ou top
+        if (this.bottom || this.top) { // Création des Hexagons dans la carte secteur si c'est une carte bottom ou top
             ArrayList<Integer> LNBR = position21(7);
-            for (int i = 0;i<7;i++){
-                Hex Hex1 = new Hex(0);
-                this.Hexa.put(i+1, Hex1);
-                Hex1.reLoc(triPrime,bottom,top,i,number);
+
+            for (int i = 0; i < 7; i++) {
+                Hex hex;
+
+                if (i + 1 == LNBR.get(0)) {
+                    hex = new Hex(2); // Hex de niveau 2
+                } else if (i + 1 == LNBR.get(1) || i + 1 == LNBR.get(2)) {
+                    hex = new Hex(1); // Hex de niveau 1
+                } else {
+                    hex = new Hex(0); // Hex de niveau 0
+                }
+
+                // Ajout dans la map
+                this.Hexa.put(i + 1, hex);
+
+                // Calcul des coordonnées et affectation
+                hex.reLoc(triPrime, bottom, top, i, number);
             }
-            Hex Hex2 = new Hex(2);
-            this.Hexa.put(LNBR.get(0), Hex2);
-            Hex2.reLoc(triPrime,bottom,top,LNBR.get(0),number);
-            Hex Hex11 = new Hex(1);
-            this.Hexa.put(LNBR.get(1), Hex11);
-            Hex11.reLoc(triPrime,bottom,top, LNBR.get(1), number);
-            Hex Hex12 = new Hex(1);
-            this.Hexa.put(LNBR.get(2), Hex12);
-            Hex12.reLoc(triPrime,bottom,top, LNBR.get(2), number);
+
         } else if (!this.bottom && !this.top && !this.triPrime) {     // Création des Hexagons dans la carte secteur si ce n'est pas une carte bottom ou top ou triPri
             ArrayList<Integer> LNBR = position21(8);
-            for (int i = 0;i<8;i++){
-                Hex Hex1 = new Hex(0);
-                this.Hexa.put(i+1, Hex1);
-                Hex1.reLoc(triPrime,bottom,top,i,number);
+
+            for (int i = 0; i < 8; i++) {
+                Hex hex;
+
+                if (i + 1 == LNBR.get(0)) {
+                    hex = new Hex(2); // Hex de niveau 2
+                } else if (i + 1 == LNBR.get(1) || i + 1 == LNBR.get(2)) {
+                    hex = new Hex(1); // Hex de niveau 1
+                } else {
+                    hex = new Hex(0); // Hex de niveau 0
+                }
+
+                // Ajout dans la map
+                this.Hexa.put(i + 1, hex);
+
+                // Calcul des coordonnées et affectation
+                hex.reLoc(triPrime, bottom, top, i, number);
             }
-            Hex Hex2 = new Hex(2);
-            this.Hexa.put(LNBR.getFirst(), Hex2);
-            Hex2.reLoc(triPrime,bottom,top, LNBR.getFirst(), number);
-            Hex Hex11 = new Hex(1);
-            this.Hexa.put(LNBR.get(1), Hex11);
-            Hex11.reLoc(triPrime,bottom,top, LNBR.get(1), number);
-            Hex Hex12 = new Hex(1);
-            this.Hexa.put(LNBR.get(2), Hex12);
-            Hex12.reLoc(triPrime,bottom,top,LNBR.get(2),number);
         } else if (this.triPrime){                                    // Création des Hexagons dans la carte secteur si c'est la carte triPri
             Hex Hex1 = new Hex(0);
             this.Hexa.put(1, Hex1);
