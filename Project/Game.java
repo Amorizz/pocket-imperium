@@ -77,8 +77,30 @@ public class Game {
         return playerNames;
     }
 
+    public ArrayList<Player> sensplayer(Game game) {
+        ArrayList<Player> playersList = new ArrayList<>(game.getPlayers());
+
+        playersList.sort((player1, player2) -> {
+            List<Integer> cards1 = player1.getCardsId();
+            List<Integer> cards2 = player2.getCardsId();
+
+            for (int i = 0; i < 3; i++) {
+                int card1 = cards1.get(i);
+                int card2 = cards2.get(i);
+
+                if (card1 != card2) {
+                    return Integer.compare(card1, card2);
+                }
+            }
+            return 0;
+        });
+
+        return playersList;
+    }
+
     public static void main(String[] args) {
         Game game = Game.getInstance();
+        Plateau jeux = new Plateau();
         try (Scanner scanner = new Scanner(System.in)) {
             int nombreJoueurs = -1;
             while (nombreJoueurs < 0) {
@@ -105,11 +127,21 @@ public class Game {
                 System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
             }
 
-        }
+            System.out.println("Les joueurs doivent choisir leur carte :");
+            for (Player player : game.getPlayers()) {
+                System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
+                player.chooseOrder();
+            }
 
-        Plateau jeux = new Plateau();
-        System.out.println(jeux.getPlateau().get("Top").get(0).getHexa(4));
-        System.out.println(jeux.getPlateau().get("Top").get(0).getHexa(4).rexAdjacent(jeux.getPlateau()));
+            ArrayList<Player> SensPlayer = new ArrayList<>();
+            SensPlayer = game.sensplayer(game);
+            for (int i = 0; i < SensPlayer.size(); i++) {
+                if (i == 0){
+                    System.out.println("C'est donc au tour de "+SensPlayer.get(0).getPlayerName());
+                }
+                System.out.println(" puis de "+SensPlayer.get(i).getPlayerName());
+            }
+        }
         game.startNextRound();
         jeux.afficherPlateau();
     }
