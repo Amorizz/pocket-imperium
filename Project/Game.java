@@ -133,7 +133,7 @@ public class Game {
                 player.chooseOrder();
             }
 
-            ArrayList<Player> SensPlayer = new ArrayList<>();
+            ArrayList<Player> SensPlayer = new ArrayList<>();               // Occuper des cartes et calculer ordre joueur
             SensPlayer = game.sensplayer(game);
             for (int i = 0; i < SensPlayer.size(); i++) {
                 if (i == 0){
@@ -141,8 +141,13 @@ public class Game {
                 } else {
                     System.out.println(" puis de "+SensPlayer.get(i).getPlayerName());
                 }
-
             }
+
+            for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
+                System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
+                player.placeFirstShips(jeux.getPlateau());
+            }
+
         }
         game.startNextRound();
         jeux.afficherPlateau();

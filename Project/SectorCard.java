@@ -34,8 +34,6 @@ public class SectorCard {
                 uniquePositions.add(generated);
             }
         }
-
-        System.out.println("Indices générés : " + uniquePositions);
         return new ArrayList<>(uniquePositions);
     }
 

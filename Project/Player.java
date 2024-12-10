@@ -1,8 +1,6 @@
 package Project;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Player {
     private int shipNumber;
@@ -72,7 +70,7 @@ public class Player {
     }
 
 
-        private List<Hex> getAvailableHexes() {
+    private List<Hex> getAvailableHexes() {
         //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
         return null;
         
@@ -140,6 +138,74 @@ public class Player {
         }
         return ids;
     }
+
+    public void placeFirstShips(HashMap<String, ArrayList<SectorCard>> plateau) {
+        List<Hex> availableHexes = new ArrayList<>();
+
+        // Parcourir le plateau pour trouver tous les hexagones disponibles
+        for (String niveau : plateau.keySet()) {
+            ArrayList<SectorCard> sectors = plateau.get(niveau);
+            for (SectorCard sector : sectors) {
+                Map<Integer, Hex> hexes = sector.getHex();
+                for (Hex hex : hexes.values()) {
+                    if (hex.getOccupation() == null) { // Hexagone non occupé
+                        availableHexes.add(hex);
+                    }
+                }
+            }
+        }
+
+        if (availableHexes.isEmpty()) {
+            System.out.println("Aucun hexagone disponible pour placer les bateaux.");
+            return;
+        }
+
+        System.out.println("Placement des premiers bateaux pour " + this.playerName);
+        int shipsToPlace = 2; // Nombre de bateaux à placer
+        Scanner scanner = new Scanner(System.in);
+
+        while (shipsToPlace > 0) {
+            System.out.println("Choisissez un hexagone parmi les suivants :");
+            System.out.println("" +
+                    "|     [1]  [2]     |#|     [8]  [9]      |#|  [15]  [16]    |\n" +
+                    "|  [3]  [4]  [5]   |#| [10]  [11]  [12]  |#| [17] [18] [19] |\n" +
+                    "|     [6]  [7]     |#|    [13]  [14]     |#|  [20]  [21]    |\n" +
+                    "#############################################################\n" +
+                    "| [22]  [23]  [24] |#|  [30]       [31]  |#| [35][36][37]   |\n" +
+                    "|    [25]  [26]    |#|        [32]       |#|    [38][39]    |\n" +
+                    "| [27]  [28]  [29] |#| [33]        [34]  |#| [40][41][42]   |\n" +
+                    "#############################################################\n" +
+                    "|    [43][44]      |#|    [50]   [51]    |#|  [57][58]      |\n" +
+                    "|  [45][46][47]    |#|  [52]  [53]  [54] |#|[59][60][61]    |\n" +
+                    "|    [48][49]      |#|     [55]  [56]    |#|  [62][63]      |\n");
+
+            int choix = -1;
+            while (choix < 1 || choix > availableHexes.size()) {
+                try {
+                    System.out.print("Votre choix (1-" + availableHexes.size() + ") : ");
+                    choix = scanner.nextInt();
+                    if (choix < 1 || choix > availableHexes.size()) {
+                        System.out.println("Choix invalide, veuillez réessayer.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Erreur : veuillez entrer un nombre valide.");
+                    scanner.next(); // Nettoyer l'entrée incorrecte
+                }
+            }
+
+            Hex selectedHex = availableHexes.get(choix - 1);
+            if (selectedHex.getShipon() < selectedHex.getMaxshipon()) {
+                selectedHex.addShip(1); // Ajouter un bateau à l'hexagone
+                selectedHex.setOccupation(this.color); // Marquer l'hexagone comme occupé
+                shipsToPlace--;
+                System.out.println("Bateau placé sur " + selectedHex);
+            } else {
+                System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
+            }
+        }
+        System.out.println("Tous les bateaux ont été placés pour " + this.playerName + ".");
+    }
+
 
 
 
