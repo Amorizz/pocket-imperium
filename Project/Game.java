@@ -138,8 +138,10 @@ public class Game {
             for (int i = 0; i < SensPlayer.size(); i++) {
                 if (i == 0){
                     System.out.println("C'est donc au tour de "+SensPlayer.get(0).getPlayerName());
+                } else {
+                    System.out.println(" puis de "+SensPlayer.get(i).getPlayerName());
                 }
-                System.out.println(" puis de "+SensPlayer.get(i).getPlayerName());
+
             }
         }
         game.startNextRound();
