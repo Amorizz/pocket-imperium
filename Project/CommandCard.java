@@ -61,9 +61,97 @@ public class CommandCard {
         }
     }
 
+    private void afficherPlateauStylise(HashMap<String, ArrayList<SectorCard>> plateau, String playerColor) {
+        int index = 1;
+        System.out.println("Affichage du plateau :");
+        for (String niveau : plateau.keySet()) {
+            ArrayList<SectorCard> sectors = plateau.get(niveau);
+            for (SectorCard sector : sectors) {
+                Map<Integer, Hex> hexes = sector.getHex();
+                for (Hex hex : hexes.values()) {
+                    if (hex.getOccupation() == null || hex.getOccupation().equals(playerColor)) {
+                        System.out.print("[" + index + "] ");
+                    } else {
+                        System.out.print("[X] ");
+                    }
+                    index++;
+                }
+                System.out.println(); // Sauter une ligne après chaque secteur
+            }
+        }
+    }
+
+    public void expand(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau) {
+        List<Hex> availableHexes = new ArrayList<>();
+        Map<Integer, Hex> hexMapping = new HashMap<>(); // Map pour associer les numéros aux hexagones
+
+        // Remplir la liste des hexagones valides et créer une map associant les indices
+        int index = 1; // Indice affiché pour l'utilisateur
+        for (String niveau : plateau.keySet()) {
+            ArrayList<SectorCard> sectors = plateau.get(niveau);
+            for (SectorCard sector : sectors) {
+                Map<Integer, Hex> hexes = sector.getHex();
+                for (Hex hex : hexes.values()) {
+                    if (hex.getOccupation() == null || hex.getOccupation().equals(playerColor)) {
+                        availableHexes.add(hex);
+                        hexMapping.put(index, hex);
+                    }
+                    index++;
+                }
+            }
+        }
+
+        // Vérifier s'il y a des hexagones valides
+        if (availableHexes.isEmpty()) {
+            System.out.println("Aucun hexagone disponible pour effectuer une expansion.");
+            return;
+        }
+
+        // Afficher le plateau stylisé avec les hexagones valides ou non
+        afficherPlateauStylise(plateau, playerColor);
+
+        // Expansion des bateaux
+        System.out.println("Sélectionnez un hexagone valide pour effectuer une expansion.");
+        int shipsToExpand = 1; // Nombre de bateaux à étendre
+        Scanner scanner = new Scanner(System.in);
+
+        while (shipsToExpand > 0) {
+            System.out.println("Choisissez un hexagone valide (affiché avec un numéro) pour étendre un bateau :");
+
+            int choix = -1;
+            while (!hexMapping.containsKey(choix)) {
+                try {
+                    System.out.print("Votre choix : ");
+                    choix = scanner.nextInt();
+                    if (!hexMapping.containsKey(choix)) {
+                        System.out.println("Choix invalide ou hexagone occupé. Veuillez réessayer.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Erreur : veuillez entrer un nombre valide.");
+                    scanner.next(); // Nettoyer l'entrée incorrecte
+                }
+            }
+
+            // Placer un bateau sur l'hexagone choisi
+            Hex selectedHex = hexMapping.get(choix);
+            if (selectedHex.getShipon() < selectedHex.getMaxshipon()) {
+                selectedHex.addShip(1); // Ajouter un bateau
+                selectedHex.setOccupation(playerColor); // Définir l'occupation par le joueur
+                shipsToExpand--;
+                System.out.println("Bateau étendu sur l'hexagone : " + selectedHex);
+            } else {
+                System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
+            }
+
+            // Mettre à jour l'affichage après l'expansion
+            afficherPlateauStylise(plateau, playerColor);
+        }
+
+        System.out.println("L'expansion est terminée pour le joueur de couleur " + playerColor + ".");
+    }
 
     public void executeCard(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau) {
-        if (this.id == 0) { // expand // Il ne faut pas qu'on ajoute un nombre de ship max par joueur ? :
+        if (this.id == 1) { // expand // Il ne faut pas qu'on ajoute un nombre de ship max par joueur ? :
             // non cest a la fin du tour
             try (Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesJoueur = new ArrayList<>();
@@ -113,7 +201,7 @@ public class CommandCard {
                 Hex hexChoisi = hexagonesJoueur.get(choix - 1);
                 hexChoisi.addShip(1);
             }
-        } else if (this.id == 1) { // explore
+        } else if (this.id == 2) { // explore
             try (Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesJoueur = new ArrayList<>();
                 Hex hexDepart = null;

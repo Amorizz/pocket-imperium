@@ -145,9 +145,13 @@ public class Game {
 
             for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
                 System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
-                player.placeFirstShips(jeux.getPlateau());
+                CommandCard c1 = new CommandCard(1);
+                c1.expand(player.getColor(), jeux.getPlateau());
+                CommandCard c2 = new CommandCard(2);
+                c2.expand(player.getColor(), jeux.getPlateau());
             }
 
+            System.out.println("Le jeux peut mantenant commencer");
 
         }
         game.startNextRound();
