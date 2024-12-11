@@ -16,7 +16,7 @@ public class Plateau {
         // Création Carte Top
         ArrayList<SectorCard> top = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            SectorCard carteTop = new SectorCard(i, false, false, true);
+            SectorCard carteTop = new SectorCard(i+1, false, false, true);
             top.add(carteTop);
         }
         jeux.put("Top", top);
@@ -31,7 +31,7 @@ public class Plateau {
         // Création Carte Bottom
         ArrayList<SectorCard> bottom = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            SectorCard carteBottom = new SectorCard(i, false, true, false);
+            SectorCard carteBottom = new SectorCard(i+1, false, true, false);
             bottom.add(carteBottom);
         }
         jeux.put("Bottom", bottom);

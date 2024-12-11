@@ -77,8 +77,30 @@ public class Game {
         return playerNames;
     }
 
+    public List<List<Player>> sensplayer(Game game) {
+        List<List<Player>> orderPerRound = new ArrayList<>();
+
+        for (int round = 0; round < 3; round++) { // 3 tours correspondant à 3 cartes
+            List<Player> playersForRound = new ArrayList<>(game.getPlayers());
+
+            // Trier les joueurs selon la carte choisie pour le tour
+            int finalRound = round;
+            playersForRound.sort((player1, player2) -> {
+                int card1 = player1.getCardsId().get(finalRound);
+                int card2 = player2.getCardsId().get(finalRound);
+                return Integer.compare(card1, card2);
+            });
+
+            orderPerRound.add(playersForRound);
+        }
+
+        return orderPerRound;
+    }
+
+
     public static void main(String[] args) {
         Game game = Game.getInstance();
+        Plateau jeux = new Plateau();
         try (Scanner scanner = new Scanner(System.in)) {
             int nombreJoueurs = -1;
             while (nombreJoueurs < 0) {
@@ -105,11 +127,29 @@ public class Game {
                 System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
             }
 
+            System.out.println("Les joueurs doivent choisir leur carte :");
+            for (Player player : game.getPlayers()) {
+                System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
+                player.chooseOrder();
+            }
+
+            List<List<Player>> SensPlayer = game.sensplayer(game);               // Occuper des cartes et calculer ordre joueur
+
+            for (int i = 0; i < SensPlayer.size()-1; i++) {
+                if (i == 0){
+                    System.out.println("C'est donc au tour de "+SensPlayer.getFirst().getFirst().getPlayerName());
+                } else {
+                    System.out.println(" puis de "+SensPlayer.getFirst().get(i).getPlayerName());
+                }
+            }
+
+            for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
+                System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
+                player.placeFirstShips(jeux.getPlateau());
+            }
+
+
         }
-
-        Plateau jeux = new Plateau();
-        System.out.println(jeux.getPlateau().get("Mid").get(1).getHexa(3));
-
         game.startNextRound();
         jeux.afficherPlateau();
     }
