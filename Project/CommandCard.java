@@ -81,8 +81,9 @@ public class CommandCard {
         }
     }
 
-    public void expand(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau, int id) {
-        if (id == 1) {
+    public void expand(String playerColor, HashMap<String, ArrayList<SectorCard>> plateau) {
+        if (id == 1) {          // expand
+            System.out.println("Vous allez EXPAND !!!");
             List<Hex> availableHexes = new ArrayList<>();
             Map<Integer, Hex> hexMapping = new HashMap<>(); // Map pour associer les numéros aux hexagones
 
@@ -117,12 +118,12 @@ public class CommandCard {
             Scanner scanner = new Scanner(System.in);
 
             while (shipsToExpand > 0) {
-                System.out.println("Choisissez un hexagone valide (affiché avec un numéro) pour étendre un bateau :");
+                System.out.println("Choisissez un hexagone valide (affiché avec un numéro) pour étendre un bateau:");
 
                 int choix = -1;
                 while (!hexMapping.containsKey(choix)) {
                     try {
-                        System.out.print("Votre choix : ");
+                        System.out.print("Votre choix: ");
                         choix = scanner.nextInt();
                         if (!hexMapping.containsKey(choix)) {
                             System.out.println("Choix invalide ou hexagone occupé. Veuillez réessayer.");
@@ -139,7 +140,7 @@ public class CommandCard {
                     selectedHex.addShip(1); // Ajouter un bateau
                     selectedHex.setOccupation(playerColor); // Définir l'occupation par le joueur
                     shipsToExpand--;
-                    System.out.println("Bateau étendu sur l'hexagone : " + selectedHex);
+                    System.out.println("Bateau étendu sur l'hexagone : " + selectedHex);
                 } else {
                     System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
                 }
@@ -150,6 +151,7 @@ public class CommandCard {
 
             System.out.println("L'expansion est terminée pour le joueur de couleur " + playerColor + ".");
         }else if (this.id == 2) { // explore
+            System.out.println("Vous allez EXPLORE !!!");
             try (Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesJoueur = new ArrayList<>();
                 Hex hexDepart = null;
@@ -207,9 +209,10 @@ public class CommandCard {
             } catch (InputMismatchException e) {
                 System.out.println("Veuillez entrer un nombre valide !");
             }
-        } else {
-            try (// invade
-                 Scanner scanner = new Scanner(System.in)) {
+        } else if (id == 3){
+            System.out.println("Vous allez INVADE !!!");
+            try ( // invade
+                  Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesCibles = new ArrayList<>();
 
                 // Parcours Plateau

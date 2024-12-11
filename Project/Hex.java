@@ -80,12 +80,7 @@ public class Hex {
 
     public String toString(){
         String string;
-        if (shipon == 0){
-            string = "X : "+this.x+" Y : "+this.y+" level : "+this.level;
-        }
-        else{
-            string = "Cet Hexagone est innocupé";
-        }
+        string = "X : "+this.x+" Y : "+this.y+" level : "+this.level+" occuper par :"+this.occupation;
         return string;
     }
 
