@@ -150,12 +150,31 @@ public class CommandCard {
             }
 
             System.out.println("L'expansion est terminée pour le joueur de couleur " + playerColor + ".");
-        }else if (this.id == 2) { // explore
+        } else if (this.id == 2) { // explore
             System.out.println("Vous allez EXPLORE !!!");
+
             try (Scanner scanner = new Scanner(System.in)) {
                 List<Hex> hexagonesJoueur = new ArrayList<>();
                 Hex hexDepart = null;
                 Hex hexCible = null;
+
+                // Trouver tous les hexagones occupés par le joueur
+                for (String niveau : plateau.keySet()) {
+                    ArrayList<SectorCard> secteurs = plateau.get(niveau);
+                    for (SectorCard sector : secteurs) {
+                        Map<Integer, Hex> hexagones = sector.getHex();
+                        for (Hex hex : hexagones.values()) {
+                            if (hex.getOccupation() != null && hex.getOccupation().equals(playerColor)) {
+                                hexagonesJoueur.add(hex);
+                            }
+                        }
+                    }
+                }
+
+                if (hexagonesJoueur.isEmpty()) {
+                    System.out.println("Vous n'avez aucune flotte à déplacer.");
+                    return;
+                }
 
                 // Demander au joueur de choisir l'hexagone de départ
                 System.out.println("Choisissez l'hexagone de départ :");
@@ -166,27 +185,26 @@ public class CommandCard {
                 int choixDepart = -1;
                 while (choixDepart < 1 || choixDepart > hexagonesJoueur.size()) {
                     System.out.print("Votre choix (1-" + hexagonesJoueur.size() + ") : ");
-                    choixDepart = scanner.nextInt();
+                    try {
+                        choixDepart = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Veuillez entrer un nombre valide !");
+                        scanner.next();
+                    }
                 }
                 hexDepart = hexagonesJoueur.get(choixDepart - 1);
 
-                // Demander au joueur de choisir l'hexagone cible
-                System.out.println("Choisissez l'hexagone cible :");
-                List<Hex> hexagonesCibles = new ArrayList<>(); // Liste pour les hexagones cibles valides
+                // Trouver tous les hexagones adjacents valides
+                List<Hex> hexagonesCibles = hexDepart.rexAdjacent(plateau);
+                hexagonesCibles.removeIf(hex -> hex.getOccupation() != null && !hex.getOccupation().equals(playerColor));
 
-                // Parcourir le plateau pour trouver les hexagones cibles
-                for (String niveau : plateau.keySet()) {
-                    ArrayList<SectorCard> secteurs = plateau.get(niveau);
-                    for (SectorCard sector : secteurs) {
-                        Map<Integer, Hex> hexagones = sector.getHex();
-                        for (Hex hex : hexagones.values()) {
-                            if (hex.getOccupation() == null && hexDepart.isAdjacent(hex, plateau)) {
-                                hexagonesCibles.add(hex);
-                            }
-                        }
-                    }
+                if (hexagonesCibles.isEmpty()) {
+                    System.out.println("Aucun hexagone adjacent valide pour déplacer la flotte.");
+                    return;
                 }
 
+                // Demander au joueur de choisir l'hexagone cible
+                System.out.println("Choisissez l'hexagone cible :");
                 for (int i = 0; i < hexagonesCibles.size(); i++) {
                     System.out.println((i + 1) + ". " + hexagonesCibles.get(i));
                 }
@@ -194,20 +212,40 @@ public class CommandCard {
                 int choixCible = -1;
                 while (choixCible < 1 || choixCible > hexagonesCibles.size()) {
                     System.out.print("Votre choix (1-" + hexagonesCibles.size() + ") : ");
-                    choixCible = scanner.nextInt();
+                    try {
+                        choixCible = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Veuillez entrer un nombre valide !");
+                        scanner.next();
+                    }
                 }
                 hexCible = hexagonesCibles.get(choixCible - 1);
 
-                // Demander si le joueur souhaite laisser un bateau
-                System.out.print("Voulez-vous laisser un bateau à l'hexagone de départ ? (oui/non) : ");
-                String reponse = scanner.next();
-                boolean shipLeft = reponse.equalsIgnoreCase("oui");
+                // Demander combien de bateaux déplacer
+                int shipsToMove = 0;
+                while (shipsToMove < 1 || shipsToMove > hexDepart.getShipon()) {
+                    System.out.print("Combien de bateaux voulez-vous déplacer (1-" + hexDepart.getShipon() + ") : ");
+                    try {
+                        shipsToMove = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Veuillez entrer un nombre valide !");
+                        scanner.next();
+                    }
+                }
 
-                // Effectuer l'expansion
-                explore(playerColor, hexDepart, hexCible, shipLeft);
-                System.out.println("Expansion effectuée avec succès !");
-            } catch (InputMismatchException e) {
-                System.out.println("Veuillez entrer un nombre valide !");
+                // Déplacer les bateaux
+                hexDepart.removeShip(shipsToMove);
+                hexCible.addShip(shipsToMove);
+                hexCible.setOccupation(playerColor);
+
+                // Vérifier si l'hexagone de départ est vide après le déplacement
+                if (hexDepart.getShipon() == 0) {
+                    hexDepart.setOccupation(null);
+                }
+
+                System.out.println("Flotte déplacée avec succès !");
+            } catch (Exception e) {
+                System.out.println("Une erreur est survenue : " + e.getMessage());
             }
         } else if (id == 3){
             System.out.println("Vous allez INVADE !!!");
