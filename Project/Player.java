@@ -69,7 +69,6 @@ public class Player {
         this.cards = order; // Mettre à jour la liste des cartes du joueur
     }
 
-
     private List<Hex> getAvailableHexes() {
         //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
         return null;
@@ -139,53 +138,100 @@ public class Player {
         return ids;
     }
 
+    public String isValide(Hex hex, Player player, int index) {
+        // Vérifier si l'hexagone est déjà occupé
+        if (hex.getOccupation() != null) {
+            return "X"; // Hexagone non valide
+        }
+
+        // Vérifier si le joueur peut placer un bateau
+        if (hex.getShipon() < hex.getMaxshipon()) {
+            return Integer.toString(index); // Retourner l'ID valide de l'hexagone
+        }
+
+        return "X"; // Sinon, hexagone non valide
+    }
+
+
+    public void afficherPlateauStylise(HashMap<String, ArrayList<SectorCard>> plateau, Player player) {
+        StringBuilder affichage = new StringBuilder();
+        int hexCount = 1; // Compteur pour numérotation des hexagones
+
+        // Parcourir les niveaux du plateau
+        for (String niveau : plateau.keySet()) {
+            ArrayList<SectorCard> sectors = plateau.get(niveau);
+
+            for (SectorCard sector : sectors) {
+                // Créer une ligne pour chaque secteur
+                affichage.append("| ");
+
+                Map<Integer, Hex> hexes = sector.getHex();
+                for (Hex hex : hexes.values()) {
+                    String resultat = isValide(hex, player,hexCount);
+                    if (resultat.equals("X")) {
+                        affichage.append("[X]  "); // Hexagone non valide
+                    } else {
+                        affichage.append("[").append(hexCount).append("]  "); // Hexagone valide avec numéro
+                    }
+                    hexCount++;
+                }
+
+                affichage.append("| "); // Fin de la ligne du secteur
+            }
+
+            // Séparation visuelle entre les niveaux
+            affichage.append("\n").append("#############################################################").append("\n");
+        }
+
+        // Afficher le résultat complet
+        System.out.println(affichage.toString());
+    }
+
+
     public void placeFirstShips(HashMap<String, ArrayList<SectorCard>> plateau) {
         List<Hex> availableHexes = new ArrayList<>();
+        Map<Integer, Hex> hexMapping = new HashMap<>(); // Map pour associer les numéros aux hexagones
 
-        // Parcourir le plateau pour trouver tous les hexagones disponibles
+        // Remplir la liste des hexagones valides et créer une map associant les indices
+        int index = 1; // Indice affiché pour l'utilisateur
         for (String niveau : plateau.keySet()) {
             ArrayList<SectorCard> sectors = plateau.get(niveau);
             for (SectorCard sector : sectors) {
                 Map<Integer, Hex> hexes = sector.getHex();
                 for (Hex hex : hexes.values()) {
-                    if (hex.getOccupation() == null) { // Hexagone non occupé
+                    if (isValide(hex, this, index).equals(Integer.toString(index))) {
                         availableHexes.add(hex);
+                        hexMapping.put(index, hex);
                     }
+                    index++;
                 }
             }
         }
 
+        // Vérifier s'il y a des hexagones valides
         if (availableHexes.isEmpty()) {
             System.out.println("Aucun hexagone disponible pour placer les bateaux.");
             return;
         }
 
+        // Afficher le plateau stylisé avec les hexagones valides ou non
+        afficherPlateauStylise(plateau, this);
+
+        // Placement des bateaux
         System.out.println("Placement des premiers bateaux pour " + this.playerName);
         int shipsToPlace = 2; // Nombre de bateaux à placer
         Scanner scanner = new Scanner(System.in);
 
         while (shipsToPlace > 0) {
-            System.out.println("Choisissez un hexagone parmi les suivants :");
-            System.out.println("" +
-                    "|     [1]  [2]     |#|     [8]  [9]      |#|  [15]  [16]    |\n" +
-                    "|  [3]  [4]  [5]   |#| [10]  [11]  [12]  |#| [17] [18] [19] |\n" +
-                    "|     [6]  [7]     |#|    [13]  [14]     |#|  [20]  [21]    |\n" +
-                    "#############################################################\n" +
-                    "| [22]  [23]  [24] |#|  [30]       [31]  |#| [35][36][37]   |\n" +
-                    "|    [25]  [26]    |#|        [32]       |#|    [38][39]    |\n" +
-                    "| [27]  [28]  [29] |#| [33]        [34]  |#| [40][41][42]   |\n" +
-                    "#############################################################\n" +
-                    "|    [43][44]      |#|    [50]   [51]    |#|  [57][58]      |\n" +
-                    "|  [45][46][47]    |#|  [52]  [53]  [54] |#|[59][60][61]    |\n" +
-                    "|    [48][49]      |#|     [55]  [56]    |#|  [62][63]      |\n");
+            System.out.println("Choisissez un hexagone valide (affiché avec un numéro) pour placer un bateau :");
 
             int choix = -1;
-            while (choix < 1 || choix > availableHexes.size()) {
+            while (!hexMapping.containsKey(choix)) {
                 try {
-                    System.out.print("Votre choix (1-" + availableHexes.size() + ") : ");
+                    System.out.print("Votre choix : ");
                     choix = scanner.nextInt();
-                    if (choix < 1 || choix > availableHexes.size()) {
-                        System.out.println("Choix invalide, veuillez réessayer.");
+                    if (!hexMapping.containsKey(choix)) {
+                        System.out.println("Choix invalide ou hexagone occupé. Veuillez réessayer.");
                     }
                 } catch (InputMismatchException e) {
                     System.out.println("Erreur : veuillez entrer un nombre valide.");
@@ -193,20 +239,19 @@ public class Player {
                 }
             }
 
-            Hex selectedHex = availableHexes.get(choix - 1);
-            if (selectedHex.getShipon() < selectedHex.getMaxshipon()) {
-                selectedHex.addShip(1); // Ajouter un bateau à l'hexagone
-                selectedHex.setOccupation(this.color); // Marquer l'hexagone comme occupé
-                shipsToPlace--;
-                System.out.println("Bateau placé sur " + selectedHex);
-            } else {
-                System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
-            }
+            // Placer un bateau sur l'hexagone choisi
+            Hex selectedHex = hexMapping.get(choix);
+            selectedHex.addShip(1); // Ajouter un bateau
+            selectedHex.setOccupation(this.color); // Définir l'occupation par le joueur
+            shipsToPlace--;
+            System.out.println("Bateau placé sur l'hexagone : " + selectedHex);
+
+            // Mettre à jour l'affichage après le placement
+            afficherPlateauStylise(plateau, this);
         }
+
         System.out.println("Tous les bateaux ont été placés pour " + this.playerName + ".");
     }
-
-
 
 
     /*

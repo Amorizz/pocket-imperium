@@ -77,26 +77,26 @@ public class Game {
         return playerNames;
     }
 
-    public ArrayList<Player> sensplayer(Game game) {
-        ArrayList<Player> playersList = new ArrayList<>(game.getPlayers());
+    public List<List<Player>> sensplayer(Game game) {
+        List<List<Player>> orderPerRound = new ArrayList<>();
 
-        playersList.sort((player1, player2) -> {
-            List<Integer> cards1 = player1.getCardsId();
-            List<Integer> cards2 = player2.getCardsId();
+        for (int round = 0; round < 3; round++) { // 3 tours correspondant à 3 cartes
+            List<Player> playersForRound = new ArrayList<>(game.getPlayers());
 
-            for (int i = 0; i < 3; i++) {
-                int card1 = cards1.get(i);
-                int card2 = cards2.get(i);
+            // Trier les joueurs selon la carte choisie pour le tour
+            int finalRound = round;
+            playersForRound.sort((player1, player2) -> {
+                int card1 = player1.getCardsId().get(finalRound);
+                int card2 = player2.getCardsId().get(finalRound);
+                return Integer.compare(card1, card2);
+            });
 
-                if (card1 != card2) {
-                    return Integer.compare(card1, card2);
-                }
-            }
-            return 0;
-        });
+            orderPerRound.add(playersForRound);
+        }
 
-        return playersList;
+        return orderPerRound;
     }
+
 
     public static void main(String[] args) {
         Game game = Game.getInstance();
@@ -133,13 +133,13 @@ public class Game {
                 player.chooseOrder();
             }
 
-            ArrayList<Player> SensPlayer = new ArrayList<>();               // Occuper des cartes et calculer ordre joueur
-            SensPlayer = game.sensplayer(game);
-            for (int i = 0; i < SensPlayer.size(); i++) {
+            List<List<Player>> SensPlayer = game.sensplayer(game);               // Occuper des cartes et calculer ordre joueur
+
+            for (int i = 0; i < SensPlayer.size()-1; i++) {
                 if (i == 0){
-                    System.out.println("C'est donc au tour de "+SensPlayer.get(0).getPlayerName());
+                    System.out.println("C'est donc au tour de "+SensPlayer.getFirst().getFirst().getPlayerName());
                 } else {
-                    System.out.println(" puis de "+SensPlayer.get(i).getPlayerName());
+                    System.out.println(" puis de "+SensPlayer.getFirst().get(i).getPlayerName());
                 }
             }
 
@@ -147,6 +147,7 @@ public class Game {
                 System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
                 player.placeFirstShips(jeux.getPlateau());
             }
+
 
         }
         game.startNextRound();
