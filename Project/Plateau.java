@@ -1,7 +1,6 @@
 package Project;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class Plateau {
 
@@ -40,6 +39,65 @@ public class Plateau {
     public HashMap<String, ArrayList<SectorCard>> getPlateau() {
         return this.jeux;
     }
+
+    public void checkPlateau() {
+        for (String niveau : jeux.keySet()) {
+            ArrayList<SectorCard> sectors = jeux.get(niveau);
+            for (SectorCard sector : sectors) {
+                Map<Integer, Hex> hexes = sector.getHex();
+                for (Hex hex : hexes.values()) {
+                    int totalShips = hex.getShipon();
+                    int maxShips = hex.getMaxshipon();
+                    List<Player> occupants = hex.getOccupants();
+
+                    // Vérifier si le nombre de ships dépasse la capacité maximale
+                    if (totalShips > maxShips) {
+                        System.out.println("Trop de ships sur l'hexagone : " + hex);
+                        int excessShips = totalShips - maxShips;
+
+                        // Réduire les ships de manière équitable parmi les occupants
+                        for (Player player : new ArrayList<>(occupants)) {
+                            int shipsToRemove = Math.min(excessShips, hex.getShipon());
+                            hex.removeShips(player, shipsToRemove);
+                            excessShips -= shipsToRemove;
+
+                            if (excessShips <= 0) {
+                                break;
+                            }
+                        }
+                    }
+
+                    // Vérifier si plusieurs couleurs occupent l'hexagone
+                    if (occupants.size() > 1) {
+                        System.out.println("Conflit de couleurs sur l'hexagone : " + hex);
+
+                        // Déterminer la couleur dominante
+                        Map<Player, Integer> shipCountByPlayer = new HashMap<>();
+                        for (Player player : occupants) {
+                            shipCountByPlayer.put(player, Collections.frequency(occupants, player));
+                        }
+
+                        Player dominantPlayer = shipCountByPlayer.entrySet().stream()
+                                .max(Map.Entry.comparingByValue())
+                                .map(Map.Entry::getKey)
+                                .orElse(null);
+
+                        // Éliminer les ships des autres joueurs
+                        for (Player player : new ArrayList<>(occupants)) {
+                            if (!player.equals(dominantPlayer)) {
+                                hex.removeShips(player, hex.getShipon());
+                                hex.removeOccupation(player);
+                            }
+                        }
+
+                        System.out.println("Couleur dominante : " + dominantPlayer.getColor());
+                    }
+                }
+            }
+        }
+    }
+
+
 
     public void afficherPlateau() {
         for (String niveau : jeux.keySet()) {
