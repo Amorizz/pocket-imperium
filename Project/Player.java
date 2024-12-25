@@ -72,7 +72,7 @@ public class Player {
 
     public void Card(int id, Plateau plateau){
         CommandCard c1 = new CommandCard(id);
-        c1.expand(this.getColor(), plateau.getPlateau());
+        c1.expand(this, plateau.getPlateau());
     }
 
     private List<Hex> getAvailableHexes() {
@@ -81,68 +81,7 @@ public class Player {
 
     }
 
-    public void resolveCombat(Player attacker, Hex hexCible) {
-        System.out.println("Combat déclenché par " + attacker.getPlayerName() + " sur l'hexagone : " + hexCible);
 
-        int attackShips = attacker.getShipNumber(); // Nombre de vaisseaux de l'attaquant
-        int defenseShips = hexCible.getShipon();   // Nombre de vaisseaux sur l'hexagone cible
-
-        if (attackShips > defenseShips) {
-            System.out.println("Victoire de " + attacker.getPlayerName() + " !");
-            hexCible.setOccupation(attacker.getColor());  // Hexagone capturé par l'attaquant
-            hexCible.setShipon(attackShips - defenseShips); // Ajuster les forces restantes
-        } else if (attackShips == defenseShips) {
-            System.out.println("Combat nul ! Les deux camps perdent leurs vaisseaux.");
-            hexCible.setOccupation(null); // Hexagone devient neutre
-            hexCible.setShipon(0);
-        } else {
-            System.out.println("Défense réussie par l'occupant !");
-            hexCible.removeShip(attackShips); // Réduire les forces défensives
-        }
-    }
-
-    public void placeFirstShips() {
-        List<Hex> availableHexes = getAvailableHexes(); // Méthode pour obtenir les hexagones disponibles
-        try (Scanner scanner = new Scanner(System.in)) { // Utilisation de try-with-resources
-            int shipsToPlace = 2; // Nombre de bateaux à placer
-            int placedShips = 0;
-
-            while (placedShips < shipsToPlace) {
-                System.out.println("Choisissez un hexagone parmi les suivants :");
-                for (int i = 0; i < availableHexes.size(); i++) {
-                    System.out.println((i + 1) + ". " + availableHexes.get(i));
-                }
-
-                int choix = -1;
-                while (choix < 1 || choix > availableHexes.size()) {
-                    System.out.print("Votre choix (1-" + availableHexes.size() + ") : ");
-                    choix = scanner.nextInt();
-                    if (choix < 1 || choix > availableHexes.size()) {
-                        System.out.println("Choix invalide, veuillez réessayer.");
-                    }
-                }
-
-                Hex selectedHex = availableHexes.get(choix - 1);
-                if (selectedHex.getShipon() < selectedHex.getMaxshipon()) {
-                    selectedHex.addShip(1); // Ajouter un bateau à l'hexagone
-                    selectedHex.setOccupation(this.color); // Marquer l'hexagone comme occupé par la couleur du joueur
-                    /*int sectorNumber = selectedHex.getSectorNumber();
-                     SectorCard sector = getSectorByNumber(sectorNumber);
-                     if (sector != null) {
-                         sector.setOccupation(this.color);
-                     }*/
-                    placedShips++;
-                    this.shipNumber++; // Augmenter le nombre de bateaux du joueur
-                    System.out.println("Bateau placé sur " + selectedHex);
-                } else {
-                    System.out.println("Cet hexagone est déjà plein. Veuillez choisir un autre hexagone.");
-                }
-            }
-
-            this.shipNumber += shipsToPlace; // Mettre à jour le nombre de bateaux du joueur
-            System.out.println("Tous les bateaux ont été placés.");
-        }
-    }
 
     public int getShips() {
         return shipNumber;

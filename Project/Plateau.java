@@ -2,6 +2,7 @@ package Project;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Plateau {
 
@@ -50,4 +51,55 @@ public class Plateau {
             }
         }
     }
+
+    public void checkPlateau() {
+        System.out.println("Vérification du plateau en cours...");
+
+        for (String niveau : jeux.keySet()) {
+            ArrayList<SectorCard> sectors = jeux.get(niveau);
+            for (SectorCard sector : sectors) {
+                HashMap<Integer, Hex> hexagones = (HashMap<Integer, Hex>) sector.getHex(); // Obtenir tous les hexagones du secteur
+                for (Hex hex : hexagones.values()) {
+                    if (!hex.getOccupation().isEmpty()) {
+                        // Vérifier si plusieurs joueurs occupent l'hexagone
+                        if (hex.getOccupation().size() > 1) {
+                            System.out.println("Conflit détecté dans l'hexagone " + hex);
+                            resolveConflict(hex);
+                        }
+
+                        // Ajuster le nombre de vaisseaux pour respecter la capacité maximale
+                        Player occupant = hex.getOccupation().keySet().iterator().next(); // Obtenir le seul occupant
+                        int ships = hex.getOccupation().get(occupant);
+                        if (ships > hex.getMaxshipon()) {
+                            hex.getOccupation().put(occupant, hex.getMaxshipon()); // Limiter au maximum permis
+                            System.out.println("Nombre de vaisseaux ajusté pour " + occupant.getPlayerName() + " dans l'hexagone " + hex);
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Vérification du plateau terminée.");
+    }
+
+    private void resolveConflict(Hex hex) {
+        // Trouver le joueur avec le plus de vaisseaux
+        Map<Player, Integer> occupation = hex.getOccupation();
+        Player winner = null;
+        int maxShips = 0;
+
+        for (Map.Entry<Player, Integer> entry : occupation.entrySet()) {
+            if (entry.getValue() > maxShips) {
+                winner = entry.getKey();
+                maxShips = entry.getValue();
+            }
+        }
+
+        // Conserver uniquement le joueur vainqueur
+        if (winner != null) {
+            hex.clearAllOccupation(); // Vider l'hexagone
+            hex.addShipsPlayer(winner, Math.min(maxShips, hex.getMaxshipon())); // Ajouter les vaisseaux du vainqueur
+            System.out.println("Conflit résolu dans l'hexagone " + hex + ". Le vainqueur est " + winner.getPlayerName());
+        }
+    }
+
 }

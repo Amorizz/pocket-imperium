@@ -5,18 +5,14 @@ import java.util.*;
 public class Hex {
     private int x;
     private int y;
-    private int shipon;
-    final int maxshipon;
-    private String occupation;
-    final int level;
-
-
+    private final int maxShipOn;
+    private final int level;
+    private Map<Player, Integer> occupation;
 
     public Hex(int level) {
         this.level = level;
-        this.maxshipon = level + 1;
-        this.occupation = null;
-        this.shipon = 0;
+        this.maxShipOn = level + 1;
+        this.occupation = new HashMap<>();
     }
 
     public void reLoc(boolean triPrime, boolean bottom, boolean top, int place, int number) {
@@ -78,45 +74,58 @@ public class Hex {
         return y;
     }
 
-    public String toString(){
-        String string;
-        string = "X : "+this.x+" Y : "+this.y+" level : "+this.level+" occuper par :"+this.occupation;
-        return string;
+    public String toString() {
+        StringBuilder sb = new StringBuilder("X: " + this.x + " Y: " + this.y + " Level: " + this.level + " Occupants: ");
+        for (Map.Entry<Player, Integer> entry : occupation.entrySet()) {
+            sb.append(entry.getKey().getPlayerName()).append(": ").append(entry.getValue()).append(" ships, ");
+        }
+        return sb.toString();
     }
 
-    public void addShip(int number){
-        //on ajoute un certain nombre de bateaux
-        this.shipon += number;
+    public void addShip(Player player, int number) {
+        occupation.put(player, occupation.getOrDefault(player, 0) + number);
+    }
 
-    };
+    public void removeShip(Player player, int number) {
+        if (occupation.containsKey(player)) {
+            int remainingShips = occupation.get(player) - number;
+            if (remainingShips > 0) {
+                occupation.put(player, remainingShips);
+            } else {
+                occupation.remove(player);
+            }
+        }
+    }
 
-    public void removeShip(int number){
-        this.shipon -= number;
-    };
+    public void clearOccupation(Player player) {
+        occupation.remove(player);
+    }
+
+    public void clearAllOccupation() {
+        this.occupation.clear();
+    }
 
     // Getters et Setters
     public int getShipon() {
-        return shipon;
+        return occupation.values().stream().mapToInt(Integer::intValue).sum();
     }
 
-    public void setShipon(int shipon) {
-        this.shipon = shipon;
-    }
 
     public int getMaxshipon() {
-        return maxshipon;
+        return maxShipOn;
     }
 
-    public String getOccupation() {
+    public Map<Player, Integer> getOccupation() {
         return occupation;
     }
 
-    public void setOccupation(String color) {
-        this.occupation = color;
-    }
 
     public int getLevel() {
         return level;
+    }
+
+    public void addShipsPlayer(Player player, int count) {
+        this.occupation.put(player, count);
     }
 
     public List<Hex> rexAdjacent(HashMap<String, ArrayList<SectorCard>> plateau) {

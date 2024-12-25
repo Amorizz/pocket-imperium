@@ -136,6 +136,9 @@ public class Game {
             // Démarrer le jeu
             game.start();
 
+            System.out.println("Le jeux peut maintenant commencer");
+            System.out.println("Nous avons bien "+game.getPlayers().size()+" joueurs");
+
             // Afficher l'état et la liste des joueurs
             System.out.println("État du jeu : " + game.getState());
             System.out.println("Liste des joueurs et leurs couleurs :");
