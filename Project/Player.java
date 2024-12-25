@@ -44,22 +44,22 @@ public class Player {
     }
 
     public void chooseOrder() {
-        List<CommandCard> order = new ArrayList<CommandCard>();
+        List<CommandCard> order = new ArrayList<>();
+        Set<Integer> selectedIds = new HashSet<>(); // Pour suivre les cartes déjà sélectionnées
+
         while (order.size() < 3) {
             System.out.println("Sélectionnez l'ordre d'exécution pour la carte " + (order.size() + 1)
                     + " (ID de la carte entre 1 et 3) :");
             try {
-                int choix = scanner.nextInt(); // Utiliser un Scanner pour lire l'entrée de l'utilisateur
+                int choix = scanner.nextInt(); // Lire l'entrée de l'utilisateur
                 if (choix < 1 || choix > 3) {
                     System.out.println("Erreur : L'ID de la carte doit être entre 1 et 3.");
+                } else if (selectedIds.contains(choix)) { // Vérification si la carte est déjà sélectionnée
+                    System.out.println("Erreur : Vous avez déjà sélectionné cette carte. Veuillez choisir un ID différent.");
                 } else {
+                    selectedIds.add(choix); // Ajouter l'ID à l'ensemble
                     CommandCard selectedCard = new CommandCard(choix - 1); // Créer une nouvelle carte avec l'ID choisi
-                    if (order.contains(selectedCard)) { // Vérification de la carte déjà sélectionnée
-                        System.out.println(
-                                "Erreur : Vous avez déjà sélectionné cette carte. Veuillez choisir un ID différent.");
-                    } else {
-                        order.add(selectedCard); // Ajouter la carte sélectionnée à l'ordre
-                    }
+                    order.add(selectedCard); // Ajouter la carte à l'ordre
                 }
             } catch (Exception e) {
                 System.out.println("Erreur : Entrée invalide. Veuillez entrer un nombre entier.");
@@ -67,6 +67,12 @@ public class Player {
             }
         }
         this.cards = order; // Mettre à jour la liste des cartes du joueur
+    }
+
+
+    public void Card(int id, Plateau plateau){
+        CommandCard c1 = new CommandCard(id);
+        c1.expand(this.getColor(), plateau.getPlateau());
     }
 
     private List<Hex> getAvailableHexes() {

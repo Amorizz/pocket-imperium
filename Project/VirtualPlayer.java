@@ -13,23 +13,28 @@ public class VirtualPlayer extends Player {
     @Override
     public void chooseOrder() {
         List<CommandCard> order = new ArrayList<>();
+        Set<Integer> selectedIds = new HashSet<>(); // Suivi des cartes déjà sélectionnées
+
         while (order.size() < 3) {
             int randomChoice = random.nextInt(3) + 1; // Choix aléatoire entre 1 et 3
-            CommandCard selectedCard = new CommandCard(randomChoice);
 
-            if (!order.contains(selectedCard)) { // Vérification que la carte n'est pas déjà sélectionnée
-                order.add(selectedCard);
+            if (!selectedIds.contains(randomChoice)) { // Vérification si la carte a déjà été sélectionnée
+                selectedIds.add(randomChoice); // Ajouter l'ID au set
+                CommandCard selectedCard = new CommandCard(randomChoice - 1); // Créer la carte correspondante
+                order.add(selectedCard); // Ajouter la carte à l'ordre
             }
         }
         this.cards = order;
         System.out.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
     }
 
-    public void VCard(CommandCard card, HashMap<String, ArrayList<SectorCard>> plateau) {
-        switch (card.getId()) {
-            case 1 -> expend(plateau);
-            case 2 -> explore(plateau);
-            case 3 -> invade(plateau);
+
+    @Override
+    public void Card(int id, Plateau plateau) {
+        switch (id) {
+            case 1 -> expend(plateau.getPlateau());
+            case 2 -> explore(plateau.getPlateau());
+            case 3 -> invade(plateau.getPlateau());
         }
     }
 

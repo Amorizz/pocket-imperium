@@ -145,10 +145,8 @@ public class Game {
 
         for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
                 System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
-                CommandCard c1 = new CommandCard(1);
-                CommandCard c2 = new CommandCard(1);
-                c1.expand(player.getColor(), jeux.getPlateau());
-                c2.expand(player.getColor(), jeux.getPlateau());
+                player.Card(1, jeux);
+                player.Card(1, jeux);
             }
 
             System.out.println("Le jeux peut mantenant commencer");
@@ -174,8 +172,7 @@ public class Game {
                     for (Player player : SensPlayer.get(i)) {
                         System.out.println("C'est à "+player.getPlayerName()+" de jouer :");
                         System.out.print(player.getPlayerName()+" joue avec la carte numero : "+SensPlayer.getFirst().get(j).getCardsId().get(j));
-                        CommandCard c1 = new CommandCard(player.getCardsId().get(j)+1);
-                        c1.expand(player.getColor(), jeux.getPlateau());
+                        player.Card(player.getCardsId().get(j), jeux);
                     }
                 }
             }
