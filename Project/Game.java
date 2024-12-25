@@ -131,8 +131,8 @@ public class Game {
                 System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
                 CommandCard c1 = new CommandCard(1);
                 CommandCard c2 = new CommandCard(1);
-                c1.expand(player, jeux.getPlateau());
-                c2.expand(player, jeux.getPlateau());
+                c1.expand(player.getColor(), jeux.getPlateau());
+                c2.expand(player.getColor(), jeux.getPlateau());
             }
 
             System.out.println("Le jeux peut mantenant commencer");
@@ -159,7 +159,7 @@ public class Game {
                         System.out.println("C'est à "+player.getPlayerName()+" de jouer :");
                         System.out.print(player.getPlayerName()+" joue avec la carte numero : "+SensPlayer.getFirst().get(j).getCardsId().get(j));
                         CommandCard c1 = new CommandCard(player.getCardsId().get(j)+1);
-                        c1.expand(player, jeux.getPlateau());
+                        c1.expand(player.getColor(), jeux.getPlateau());
                     }
                 }
             }
