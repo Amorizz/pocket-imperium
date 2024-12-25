@@ -5,7 +5,7 @@ import java.util.*;
 public class Player {
     private int shipNumber;
     private String playerName;
-    private List<CommandCard> cards;
+    List<CommandCard> cards;
     private int points;
     private Scanner scanner;
     private String color;
@@ -73,6 +73,26 @@ public class Player {
         //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
         return null;
 
+    }
+
+    public void resolveCombat(Player attacker, Hex hexCible) {
+        System.out.println("Combat déclenché par " + attacker.getPlayerName() + " sur l'hexagone : " + hexCible);
+
+        int attackShips = attacker.getShipNumber(); // Nombre de vaisseaux de l'attaquant
+        int defenseShips = hexCible.getShipon();   // Nombre de vaisseaux sur l'hexagone cible
+
+        if (attackShips > defenseShips) {
+            System.out.println("Victoire de " + attacker.getPlayerName() + " !");
+            hexCible.setOccupation(attacker.getColor());  // Hexagone capturé par l'attaquant
+            hexCible.setShipon(attackShips - defenseShips); // Ajuster les forces restantes
+        } else if (attackShips == defenseShips) {
+            System.out.println("Combat nul ! Les deux camps perdent leurs vaisseaux.");
+            hexCible.setOccupation(null); // Hexagone devient neutre
+            hexCible.setShipon(0);
+        } else {
+            System.out.println("Défense réussie par l'occupant !");
+            hexCible.removeShip(attackShips); // Réduire les forces défensives
+        }
     }
 
     public void placeFirstShips() {

@@ -103,31 +103,47 @@ public class Game {
         Plateau jeux = new Plateau();
         try (Scanner scanner = new Scanner(System.in)) {
             int nombreJoueurs = -1;
-            while (nombreJoueurs < 0) {
-                System.out.println("Combien de joueurs vont jouer ?");
+
+            // Demander le nombre de joueurs réels
+            while (nombreJoueurs < 0 || nombreJoueurs > 4) {
+                System.out.println("Combien de joueurs réels vont jouer ? (0 à 4)");
                 try {
                     nombreJoueurs = scanner.nextInt();
-                    if (nombreJoueurs < 0) {
-                        System.out.println("Erreur : Veuillez entrer un nombre entier positif.");
+                    if (nombreJoueurs < 0 || nombreJoueurs > 4) {
+                        System.out.println("Erreur : Veuillez entrer un nombre compris entre 0 et 4.");
                     }
                 } catch (InputMismatchException e) {
                     System.out.println("Erreur : Veuillez entrer un nombre entier.");
                     scanner.next(); // Consomme l'entrée invalide
                 }
             }
+
+            // Ajouter les joueurs réels
             for (int i = 0; i < nombreJoueurs; i++) {
                 System.out.println("Nom du joueur " + (i + 1) + " ?");
                 String nomJoueur = scanner.next();
-                game.addPlayer(new Player(0, nomJoueur, 0)); // Utilisation de l'énum pour la couleur
+                game.addPlayer(new Player(0, nomJoueur, 0));
             }
+
+            // Ajouter des joueurs virtuels pour compléter jusqu'à 4 joueurs
+            int nombreJoueursVirtuels = 4 - nombreJoueurs;
+            for (int i = 0; i < nombreJoueursVirtuels; i++) {
+                String nomJoueurVirtuel = "Joueur Virtuel " + (i + 1);
+                System.out.println("Ajout du joueur virtuel : " + nomJoueurVirtuel);
+                game.addPlayer(new VirtualPlayer(0, nomJoueurVirtuel, 0));
+            }
+
+            // Démarrer le jeu
             game.start();
+
+            // Afficher l'état et la liste des joueurs
             System.out.println("État du jeu : " + game.getState());
             System.out.println("Liste des joueurs et leurs couleurs :");
             for (Player player : game.getPlayers()) {
                 System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
             }
 
-            for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
+        for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
                 System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
                 CommandCard c1 = new CommandCard(1);
                 CommandCard c2 = new CommandCard(1);
