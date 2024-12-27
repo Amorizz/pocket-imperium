@@ -147,38 +147,39 @@ public class Game {
             }
 
         for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
-                System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
-                player.Card(1, jeux);
-                player.Card(1, jeux);
+            System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
+            player.Card(1, jeux);
+            player.Card(1, jeux);
+        }
+
+        System.out.println("Le jeux peut mantenant commencer");
+
+        for (int i = 0; i < 9;i++){
+            System.out.println("Les joueurs doivent choisir leur carte :");
+            for (Player player : game.getPlayers()) {
+                System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
+                player.chooseOrder();
             }
 
-            System.out.println("Le jeux peut mantenant commencer");
+            List<List<Player>> SensPlayer = game.sensplayer(game);               // Occuper des cartes et calculer ordre joueur
 
-            for (int i = 0; i < 9;i++){
-                System.out.println("Les joueurs doivent choisir leur carte :");
-                for (Player player : game.getPlayers()) {
-                    System.out.println(player.getPlayerName() + " - Couleur : " + player.getColor());
-                    player.chooseOrder();
-                }
-
-                List<List<Player>> SensPlayer = game.sensplayer(game);               // Occuper des cartes et calculer ordre joueur
-
-                for (int j = 0; j < SensPlayer.size()-1; j++) {
-                    if (j == 0){
-                        System.out.println("C'est donc au tour de "+SensPlayer.getFirst().getFirst().getPlayerName());
-                    } else {
-                        System.out.println(" puis de "+SensPlayer.getFirst().get(j).getPlayerName());
-                    }
-                }
-
-                for (int j = 0;j < 3;j++){
-                    for (Player player : SensPlayer.get(i)) {
-                        System.out.println("C'est à "+player.getPlayerName()+" de jouer :");
-                        System.out.print(player.getPlayerName()+" joue avec la carte numero : "+SensPlayer.getFirst().get(j).getCardsId().get(j));
-                        player.Card(player.getCardsId().get(j), jeux);
-                    }
+            for (int j = 0; j < SensPlayer.size()-1; j++) {
+                if (j == 0){
+                    System.out.println("C'est donc au tour de "+SensPlayer.getFirst().getFirst().getPlayerName());
+                } else {
+                    System.out.println(" puis de "+SensPlayer.getFirst().get(j).getPlayerName());
                 }
             }
+
+            for (int j = 0;j < 3;j++){
+                for (Player player : SensPlayer.get(i)) {
+                    System.out.println("C'est à "+player.getPlayerName()+" de jouer :");
+                    System.out.print(player.getPlayerName()+" joue avec la carte numero : "+SensPlayer.getFirst().get(j).getCardsId().get(j));
+                    player.Card(player.getCardsId().get(j), jeux);
+                }
+                jeux.checkPlateau();
+            }
+        }
 
         }
         game.startNextRound();

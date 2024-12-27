@@ -58,7 +58,7 @@ public class Player {
                     System.out.println("Erreur : Vous avez déjà sélectionné cette carte. Veuillez choisir un ID différent.");
                 } else {
                     selectedIds.add(choix); // Ajouter l'ID à l'ensemble
-                    CommandCard selectedCard = new CommandCard(choix - 1); // Créer une nouvelle carte avec l'ID choisi
+                    CommandCard selectedCard = new CommandCard(choix); // Créer une nouvelle carte avec l'ID choisi
                     order.add(selectedCard); // Ajouter la carte à l'ordre
                 }
             } catch (Exception e) {
@@ -72,7 +72,7 @@ public class Player {
 
     public void Card(int id, Plateau plateau){
         CommandCard c1 = new CommandCard(id);
-        c1.expand(this, plateau.getPlateau());
+        c1.executeCard(this, plateau.getPlateau());
     }
 
     private List<Hex> getAvailableHexes() {
