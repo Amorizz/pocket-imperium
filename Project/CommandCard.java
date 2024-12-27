@@ -49,6 +49,22 @@ public class CommandCard {
         }
     }
 
+    private void afficherPlateau(){
+        System.out.println(""+
+        "  [ 1] [ 2] #  [ 8] [ 9] #  [15] [16]"+
+        "[ 3][ 4][ 5]#[10][11][12]#[17][18][19]"+
+        "  [ 6] [ 7] #  [13] [14] #  [20] [21]"+
+        "####################"+
+        "[22][23][24]#[30]   [31]#[35][36][37]"+
+        "  [25] [26] #    [32]   #  [38] [39]"+
+        "[27][28][29]#[33]   [34]#[40][41][42]"+
+        "######################################"+
+        "  [43] [44] #  [50] [51] #  [57] [58]"+
+        "[45][46][47]#[52][53][54]#[59][60][61]"+
+        "  [48] [49] #  [55] [56] #  [62] [63]"+
+        )
+    }
+
     public void expand(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         if (id == 1) { // Expand
             System.out.println(player.getPlayerName() + " va étendre ses forces !");
