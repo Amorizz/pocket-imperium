@@ -1,9 +1,12 @@
 package Project;
 
 import java.util.*;
+import java.util.random.RandomGenerator;
 
 public class CommandCard {
     private int id;
+    private int power = 1;
+    private final Random random = new Random(); // Générateur aléatoire partagé
 
     public CommandCard(int id) {
         this.id = id;
@@ -11,6 +14,14 @@ public class CommandCard {
 
     public int getId() {
         return this.id;
+    }
+
+    public int getPower() {
+        return this.power;
+    }
+
+    public void setPower(int power) {
+        this.power = power;
     }
 
     private void afficherPlateauStylise(HashMap<String, ArrayList<SectorCard>> plateau, Player player) {
@@ -66,63 +77,130 @@ public class CommandCard {
     }
 
     public void expand(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
-        Scanner scanner = new Scanner(System.in);
+        int maxShipsToAdd = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            case 3 -> 1;
+            default -> 0;
+        };
+
+        if (maxShipsToAdd == 0) {
+            System.out.println("Aucun bateau ne peut être ajouté en raison de la puissance de la carte.");
+            return;
+        }
+
         System.out.println(player.getPlayerName() + " va étendre ses forces !");
-        List<Hex> availableHexes = new ArrayList<>();
+        List<Hex> controlledHexes = new ArrayList<>();
         Map<Integer, Hex> hexMapping = new HashMap<>();
 
-        // Remplir la liste des hexagones valides
+        // Remplir la liste des hexagones contrôlés par le joueur
         int index = 1;
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
-                    availableHexes.add(hex);
-                    hexMapping.put(index, hex);
-                    index++;
+                    if (hex.getOccupation().containsKey(player)) {
+                        controlledHexes.add(hex);
+                        hexMapping.put(index, hex);
+                        index++;
+                    }
                 }
             }
         }
 
         // Vérification des hexagones disponibles
-        if (availableHexes.isEmpty()) {
-            System.out.println("Aucun hexagone disponible pour l'expansion.");
+        if (controlledHexes.isEmpty()) {
+            System.out.println("Aucun hexagone contrôlé par " + player.getPlayerName() + " pour ajouter des bateaux.");
             return;
         }
 
-        // Afficher le plateau stylisé
-        afficherPlateau();
+        Scanner scanner = new Scanner(System.in);
 
-        Hex selectedHex = null;
-        while (selectedHex == null) {
-            System.out.println("Choisissez un hexagone valide pour effectuer une expansion :");
-            int choix = -1;
+        // Ajouter des bateaux jusqu'à atteindre la limite
+        while (maxShipsToAdd > 0) {
+            afficherPlateau();
+            Hex selectedHex = null;
 
-            while (!hexMapping.containsKey(choix)) {
-                try {
-                    System.out.print("Votre choix : ");
-                    choix = scanner.nextInt();
-                    if (!hexMapping.containsKey(choix)) {
-                        System.out.println("Hexagone invalide. Veuillez réessayer.");
+            // Demander à l'utilisateur de sélectionner un hexagone valide
+            while (selectedHex == null) {
+                System.out.println("Vous pouvez encore ajouter " + maxShipsToAdd + " bateau(x).");
+                System.out.println("Choisissez un hexagone parmi ceux que vous contrôlez :");
+                for (int i = 0; i < controlledHexes.size(); i++) {
+                    System.out.println((i + 1) + ". " + controlledHexes.get(i));
+                }
+
+                int choix = -1;
+                while (!hexMapping.containsKey(choix)) {
+                    try {
+                        System.out.print("Votre choix : ");
+                        choix = scanner.nextInt();
+                        if (!hexMapping.containsKey(choix)) {
+                            System.out.println("Hexagone invalide. Veuillez réessayer.");
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                        scanner.next();
                     }
-                } catch (InputMismatchException e) {
-                    System.out.println("Entrée invalide. Veuillez entrer un nombre.");
-                    scanner.next();
+                }
+
+                selectedHex = hexMapping.get(choix);
+                System.out.println("Vous avez choisi l'hexagone : " + selectedHex);
+                System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
+                String confirmation = scanner.next();
+                if (!confirmation.equalsIgnoreCase("oui")) {
+                    selectedHex = null;
                 }
             }
 
-            selectedHex = hexMapping.get(choix);
-            System.out.println("Vous avez choisi l'hexagone : " + selectedHex);
-            System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
-            String confirmation = scanner.next();
-            if (!confirmation.equalsIgnoreCase("oui")) {
-                selectedHex = null; // Réinitialiser pour refaire le choix
+            // Ajouter un bateau sur l'hexagone sélectionné
+            selectedHex.addShip(player, 1);
+            maxShipsToAdd--;
+            System.out.println(player.getPlayerName() + " a ajouté un bateau sur : " + selectedHex);
+        }
+
+        System.out.println("Expansion terminée pour " + player.getPlayerName() + ".");
+    }
+
+    private void vExpend(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        int maxShipsToAdd = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            case 3 -> 1;
+            default -> 0;
+        };
+
+        if (maxShipsToAdd == 0) {
+            System.out.println(player.getPlayerName() + " ne peut pas ajouter de bateaux en raison de la puissance de la carte.");
+            return;
+        }
+
+        System.out.println(player.getPlayerName() + " va étendre ses forces !");
+        List<Hex> controlledHexes = player.getOwnedHexes(plateau);
+
+        if (controlledHexes.isEmpty()) {
+            System.out.println("Aucun hexagone contrôlé par " + player.getPlayerName() + " pour ajouter des bateaux.");
+            return;
+        }
+
+        Random random = new Random();
+
+        // Répartition automatique des bateaux
+        while (maxShipsToAdd > 0 && !controlledHexes.isEmpty()) {
+            Hex selectedHex = controlledHexes.get(random.nextInt(controlledHexes.size())); // Choix aléatoire
+            int currentShips = selectedHex.getOccupation().getOrDefault(player, 0);
+
+            if (currentShips < selectedHex.getMaxshipon()) {
+                selectedHex.addShip(player, 1);
+                maxShipsToAdd--;
+                System.out.println(player.getPlayerName() + " a ajouté un bateau sur : " + selectedHex);
+            } else {
+                // Si l'hexagone est plein, on le retire des hexagones contrôlés pour éviter de le rechoisir
+                controlledHexes.remove(selectedHex);
             }
         }
 
-        // Ajouter un bateau pour le joueur dans l'hexagone
-        selectedHex.addShip(player, 1);
-        System.out.println(player.getPlayerName() + " a ajouté un bateau sur : " + selectedHex);
+        System.out.println("Expansion terminée pour " + player.getPlayerName() + ".");
     }
+
 
     public void explore(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         Scanner scanner = new Scanner(System.in);
@@ -208,7 +286,54 @@ public class CommandCard {
             }
         }
 
-        System.out.println(player.getPlayerName() + " a décidé d'explorer depuis " + hexDepart + " vers " + hexCible);
+        // Demander combien de ships déplacer
+        int shipsToMove = 0;
+        int shipsAvailable = hexDepart.getOccupation().get(player);
+        System.out.println("Combien de bateaux voulez-vous déplacer ? (max : " + shipsAvailable + ")");
+        while (shipsToMove < 1 || shipsToMove > shipsAvailable) {
+            try {
+                System.out.print("Votre choix : ");
+                shipsToMove = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                scanner.next();
+            }
+        }
+
+        // Déplacer les ships
+        hexDepart.removeShip(player, shipsToMove);
+        hexCible.addShip(player, shipsToMove);
+
+        System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible + ".");
+    }
+
+    public void vExplore(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        System.out.println(player.getPlayerName() + " va explorer !");
+        List<Hex> ownedHexes = player.getOwnedHexes(plateau);
+
+        if (ownedHexes.isEmpty()) {
+            System.out.println(player.getPlayerName() + " n'a aucune flotte à déplacer.");
+            return;
+        }
+
+        Hex hexDepart = ownedHexes.get(random.nextInt(ownedHexes.size())); // Choix aléatoire de départ
+        List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
+
+        // Filtrer les hexagones adjacents non occupés
+        adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty());
+
+        if (adjacentHexes.isEmpty()) {
+            System.out.println("Aucun hexagone adjacent valide pour explorer.");
+            return;
+        }
+
+        Hex hexCible = adjacentHexes.get(random.nextInt(adjacentHexes.size())); // Choix aléatoire de cible
+        int shipsToMove = random.nextInt(hexDepart.getOccupation().get(player)) + 1; // Déplacer 1 à tous les bateaux disponibles
+
+        hexDepart.removeShip(player, shipsToMove);
+        hexCible.addShip(player, shipsToMove);
+
+        System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible);
     }
 
     public void invade(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
@@ -216,6 +341,7 @@ public class CommandCard {
         System.out.println(player.getPlayerName() + " prépare une invasion !");
         List<Hex> enemyHexes = new ArrayList<>();
 
+        // Trouver les hexagones ennemis
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
@@ -258,19 +384,87 @@ public class CommandCard {
             }
         }
 
-        System.out.println(player.getPlayerName() + " a décidé d'envahir " + hexCible);
+        // Demander le nombre de ships à utiliser pour l'attaque
+        int shipsToUse = 0;
+        System.out.println("Combien de vaisseaux voulez-vous utiliser pour l'attaque ? (max : " + 10 + ")");
+        while (shipsToUse < 1 || shipsToUse > 10) {
+            try {
+                System.out.print("Votre choix : ");
+                shipsToUse = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                scanner.next();
+            }
+        }
+
+        // Ajouter les forces attaquantes à l'hexagone cible
+        hexCible.addShip(player, shipsToUse);
+        System.out.println(player.getPlayerName() + " a envoyé " + shipsToUse + " vaisseaux pour envahir " + hexCible);
+
+        // La résolution du combat sera gérée par la méthode `checkPlateau`
+        System.out.println("Combat ajouté à l'hexagone. Résolution à la fin du tour.");
+    }
+
+    public void vInvade(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        System.out.println(player.getPlayerName() + " prépare une invasion !");
+        List<Hex> enemyHexes = player.getEnemyHexes(plateau);
+
+        // Vérifier si des hexagones ennemis sont disponibles
+        if (enemyHexes.isEmpty()) {
+            System.out.println(player.getPlayerName() + " n'a aucun hexagone cible à envahir.");
+            return;
+        }
+
+        // Choisir un hexagone ennemi de manière aléatoire
+        Hex hexCible = enemyHexes.get(random.nextInt(enemyHexes.size()));
+
+        // Déterminer le nombre de vaisseaux à utiliser pour l'invasion (au moins 1)
+        int shipsToUse = random.nextInt(10) + 1;
+
+        // Ajouter les forces attaquantes à l'hexagone cible
+        hexCible.addShip(player, shipsToUse);
+        System.out.println(player.getPlayerName() + " a attaqué " + hexCible + " avec " + shipsToUse + " vaisseaux.");
+
+        // La résolution du combat sera gérée par la méthode `checkPlateau`
+        System.out.println("Combat ajouté à l'hexagone. Résolution à la fin du tour.");
     }
 
     public void executeCard(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
-        if (id == 1) { // Expand
-            expand(player, plateau);
-        } else if (id == 2) { // Explore
-            explore(player, plateau);
-        } else if (id == 3) { // Invade
-            invade(player, plateau);
+        if (player instanceof VirtualPlayer) {
+            if (id == 1) { // Expand
+                vExpend((VirtualPlayer) player, plateau);
+            } else if (id == 2) { // Explore
+                vExplore((VirtualPlayer) player, plateau);
+            } else if (id == 3) { // Invade
+                vInvade((VirtualPlayer) player, plateau);
+            }else {
+                System.out.println("Carte inconnue. Veuillez vérifier l'ID de la carte.");
+            }
         } else {
-            System.out.println("Carte inconnue. Veuillez vérifier l'ID de la carte.");
+            if (id == 1) { // Expand
+                expand(player, plateau);
+            } else if (id == 2) { // Explore
+                explore(player, plateau);
+            } else if (id == 3) { // Invade
+                invade(player, plateau);
+            } else {
+                System.out.println("Carte inconnue. Veuillez vérifier l'ID de la carte.");
+            }
+
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        CommandCard that = (CommandCard) obj;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }

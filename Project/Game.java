@@ -80,8 +80,26 @@ public class Game {
     public List<List<Player>> sensplayer(Game game) {
         List<List<Player>> orderPerRound = new ArrayList<>();
 
-        for (int round = 0; round < 3; round++) { // 3 tours correspondant à 3 cartes
+        // Parcourir les 3 tours correspondant aux 3 cartes
+        for (int round = 0; round < 3; round++) {
             List<Player> playersForRound = new ArrayList<>(game.getPlayers());
+
+            // Créer une map pour compter le nombre de joueurs ayant chaque commande
+            Map<Integer, Integer> commandCount = new HashMap<>();
+
+            // Compter les occurrences des commandes pour ce tour
+            for (Player player : playersForRound) {
+                int cardId = player.getCardsId().get(round);
+                commandCount.put(cardId, commandCount.getOrDefault(cardId, 0) + 1);
+            }
+
+            // Mettre à jour le power de chaque carte pour chaque joueur
+            for (Player player : playersForRound) {
+                int cardId = player.getCardsId().get(round);
+                CommandCard card = player.getCards().get(round); // Récupérer la carte
+                int power = Math.min(commandCount.get(cardId), 3); // Limiter le power à 3 maximum
+                card.setPower(power); // Mettre à jour le power de la carte
+            }
 
             // Trier les joueurs selon la carte choisie pour le tour
             int finalRound = round;
@@ -97,6 +115,48 @@ public class Game {
         return orderPerRound;
     }
 
+    public void calculateScore(HashMap<String, ArrayList<SectorCard>> plateau, List<Player> players) {
+        System.out.println("Calcul des scores...");
+
+        // Réinitialiser les scores avant chaque calcul
+        for (Player player : players) {
+            player.resetPoints(); // Supposons que Player possède une méthode resetPoints()
+        }
+
+        for (String niveau : plateau.keySet()) {
+            for (SectorCard sector : plateau.get(niveau)) {
+                for (Hex hex : sector.getHex().values()) {
+                    // Trouver le joueur ayant le plus de ships sur cet hexagone
+                    Player dominantPlayer = null;
+                    int maxShips = 0;
+
+                    for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
+                        if (entry.getValue() > maxShips) {
+                            dominantPlayer = entry.getKey();
+                            maxShips = entry.getValue();
+                        } else if (entry.getValue() == maxShips) {
+                            dominantPlayer = null; // Égalité, personne ne domine cet hexagone
+                        }
+                    }
+
+                    if (dominantPlayer != null) {
+                        // Ajouter des points au joueur dominant
+                        dominantPlayer.addPoints(1); // 1 point par hexagone contrôlé
+
+                        // Vérifier si c'est un hexagone stratégique (comme TriPrime)
+                        if (hex.getLevel() == 3) { // Exemple : TriPrime est de niveau 3
+                            dominantPlayer.addPoints(2); // Bonus de 2 points pour TriPrime
+                        }
+                    }
+                }
+            }
+        }
+
+        // Afficher les scores après le calcul
+        for (Player player : players) {
+            System.out.println(player.getPlayerName() + " a " + player.getPoints() + " points.");
+        }
+    }
 
     public static void main(String[] args) {
         Game game = Game.getInstance();
@@ -122,7 +182,7 @@ public class Game {
             for (int i = 0; i < nombreJoueurs; i++) {
                 System.out.println("Nom du joueur " + (i + 1) + " ?");
                 String nomJoueur = scanner.next();
-                game.addPlayer(new Player(0, nomJoueur, 0));
+                game.addPlayer(new Player(nomJoueur, 0));
             }
 
             // Ajouter des joueurs virtuels pour compléter jusqu'à 4 joueurs
@@ -130,7 +190,7 @@ public class Game {
             for (int i = 0; i < nombreJoueursVirtuels; i++) {
                 String nomJoueurVirtuel = "Joueur Virtuel " + (i + 1);
                 System.out.println("Ajout du joueur virtuel : " + nomJoueurVirtuel);
-                game.addPlayer(new VirtualPlayer(0, nomJoueurVirtuel, 0));
+                game.addPlayer(new VirtualPlayer(nomJoueurVirtuel, 0));
             }
 
             // Démarrer le jeu
@@ -148,8 +208,8 @@ public class Game {
 
         for (Player player : game.getPlayers()) {                       // Placer le first ship de chaque joueur
             System.out.println("C'est a "+player.getPlayerName()+" de placer ces deux premiers bateaux :");
-            player.Card(1, jeux);
-            player.Card(1, jeux);
+            player.firstShip(jeux);
+            player.firstShip(jeux);
         }
 
         System.out.println("Le jeux peut mantenant commencer");
@@ -175,7 +235,7 @@ public class Game {
                 for (Player player : SensPlayer.get(i)) {
                     System.out.println("C'est à "+player.getPlayerName()+" de jouer :");
                     System.out.print(player.getPlayerName()+" joue avec la carte numero : "+SensPlayer.getFirst().get(j).getCardsId().get(j));
-                    player.Card(player.getCardsId().get(j), jeux);
+                    player.Card(j, jeux);
                 }
                 jeux.checkPlateau();
             }
@@ -183,6 +243,5 @@ public class Game {
 
         }
         game.startNextRound();
-        jeux.afficherPlateau();
     }
 }

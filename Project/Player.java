@@ -3,9 +3,8 @@ package Project;
 import java.util.*;
 
 public class Player {
-    private int shipNumber;
     private String playerName;
-    List<CommandCard> cards;
+    private List<CommandCard> cards;
     private int points;
     private Scanner scanner;
     private String color;
@@ -14,20 +13,15 @@ public class Player {
         return points;
     }
 
+    public void resetPoints() {
+        this.points = 0;
+    }
+
     public void addPoints(int points) {
         this.points += points;
     }
 
-    public int getShipNumber() {
-        return this.shipNumber;
-    }
-
-    public void setShipNumber(int number) {
-        this.shipNumber = number;
-    }
-
-    public Player(int shipNumber, String playerName, int points) {
-        this.shipNumber = shipNumber;
+    public Player(String playerName, int points) {
         this.playerName = playerName;
         this.cards = new ArrayList<CommandCard>();
         this.points = points;
@@ -69,22 +63,74 @@ public class Player {
         this.cards = order; // Mettre à jour la liste des cartes du joueur
     }
 
+    public void firstShip(Plateau plateau) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(getPlayerName() + " place son premier bateau.");
+        List<Hex> availableHexes = new ArrayList<>();
+        Map<Integer, Hex> hexMapping = new HashMap<>();
+
+        // Construire la liste des hexagones disponibles pour le placement
+        int index = 1;
+        for (String niveau : plateau.getPlateau().keySet()) {
+            for (SectorCard sector : plateau.getPlateau().get(niveau)) {
+                for (Hex hex : sector.getHex().values()) {
+                    availableHexes.add(hex);
+                    hexMapping.put(index, hex);
+                    index++;
+                }
+            }
+        }
+
+        // Vérification des hexagones disponibles
+        if (availableHexes.isEmpty()) {
+            System.out.println("Aucun hexagone disponible pour placer le premier bateau.");
+            return;
+        }
+
+        Hex selectedHex = null;
+
+        // Afficher les hexagones disponibles et demander un choix
+        while (selectedHex == null) {
+            System.out.println("Choisissez un hexagone pour placer votre premier bateau :");
+            plateau.afficherPlateau();
+
+            int choix = -1;
+            while (!hexMapping.containsKey(choix)) {
+                try {
+                    System.out.print("Votre choix : ");
+                    choix = scanner.nextInt();
+                    if (!hexMapping.containsKey(choix)) {
+                        System.out.println("Hexagone invalide. Veuillez réessayer.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                    scanner.next();
+                }
+            }
+
+            selectedHex = hexMapping.get(choix);
+            System.out.println("Vous avez choisi l'hexagone : " + selectedHex);
+            System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
+            String confirmation = scanner.next();
+            if (!confirmation.equalsIgnoreCase("oui")) {
+                selectedHex = null; // Réinitialiser pour refaire le choix
+            }
+        }
+
+        // Ajouter le bateau sur l'hexagone choisi
+        selectedHex.addShip(this, 1);
+        System.out.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
+    }
+
 
     public void Card(int id, Plateau plateau){
-        CommandCard c1 = new CommandCard(id);
-        c1.executeCard(this, plateau.getPlateau());
+        cards.get(id).executeCard(this,plateau.getPlateau());
     }
 
     private List<Hex> getAvailableHexes() {
         //renvoi la liste des hex qui sont tel que secteur est innocupé et lhex est un sys innocupé
         return null;
 
-    }
-
-
-
-    public int getShips() {
-        return shipNumber;
     }
 
     public String getPlayerName() {
