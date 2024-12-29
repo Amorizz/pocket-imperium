@@ -1,4 +1,4 @@
-package Project;
+package Project.Console;
 
 public class Ship {
     private String color;

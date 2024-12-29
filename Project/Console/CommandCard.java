@@ -1,7 +1,6 @@
-package Project;
+package Project.Console;
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 public class CommandCard {
     private int id;

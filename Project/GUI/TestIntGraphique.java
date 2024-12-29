@@ -1,10 +1,8 @@
-package Project;
+package Project.GUI;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.awt.*;
 import java.awt.geom.Path2D;
 
 public class TestIntGraphique extends JFrame {

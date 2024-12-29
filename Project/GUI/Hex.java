@@ -1,4 +1,4 @@
-package Project;
+package Project.GUI;
 
 import java.util.*;
 

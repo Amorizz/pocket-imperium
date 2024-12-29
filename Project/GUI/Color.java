@@ -1,4 +1,4 @@
-package Project;
+package Project.GUI;
 
 public enum Color {
     ROUGE("rouge"),

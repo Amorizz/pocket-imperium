@@ -1,4 +1,4 @@
-package Project;
+package Project.GUI;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public class VirtualPlayer extends Player {
     }
 
     @Override
-    public void chooseOrder() {
+    public void chooseOrder(ConsoleGUI console) {
         List<CommandCard> order = new ArrayList<>();
         Set<Integer> selectedIds = new HashSet<>();
 
@@ -38,7 +38,7 @@ public class VirtualPlayer extends Player {
         }
 
         this.card = order; // Mettre à jour l'attribut `card`
-        System.out.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
+        console.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
     }
 
     @Override
@@ -50,27 +50,24 @@ public class VirtualPlayer extends Player {
         return ids;
     }
 
-
-
-
     @Override
-    public void Card(int id, Plateau plateau) {
-        card.get(id).executeCard(this, plateau.getPlateau());
+    public void Card(int id, Plateau plateau, ConsoleGUI console) {
+        card.get(id).executeCard(this, plateau.getPlateau(), console);
     }
 
     @Override
-    public void firstShip(Plateau plateau) {
-        System.out.println(getPlayerName() + " place son premier bateau.");
+    public void firstShip(Plateau plateau, ConsoleGUI console) {
+        console.println(getPlayerName() + " place son premier bateau.");
         List<Hex> validHexes = getValidHexes(plateau.getPlateau());
 
         if (validHexes.isEmpty()) {
-            System.out.println("Aucun hexagone disponible pour placer le premier bateau.");
+            console.println("Aucun hexagone disponible pour placer le premier bateau.");
             return;
         }
 
         Hex selectedHex = validHexes.get(random.nextInt(validHexes.size())); // Choix aléatoire
         selectedHex.addShip(this, 1); // Ajouter un bateau pour le joueur
-        System.out.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
+        console.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
     }
 
 

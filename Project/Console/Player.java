@@ -1,4 +1,4 @@
-package Project;
+package Project.Console;
 
 import java.util.*;
 
