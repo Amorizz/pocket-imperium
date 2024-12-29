@@ -8,6 +8,7 @@ public class Player {
     private int points;
     private Scanner scanner;
     private String color;
+    private int shipNbr;
 
     public int getPoints() {
         return points;
@@ -27,6 +28,15 @@ public class Player {
         this.points = points;
         this.scanner = new Scanner(System.in);
         this.color = null;
+        this.shipNbr = 15;
+    }
+
+    public int getShipNumber() {
+        return shipNbr;
+    }
+
+    public void setShipNumber(int shipNbr) {
+        this.shipNbr = shipNbr;
     }
 
     public String getColor() {

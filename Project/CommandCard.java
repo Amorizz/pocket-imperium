@@ -201,13 +201,11 @@ public class CommandCard {
         System.out.println("Expansion terminée pour " + player.getPlayerName() + ".");
     }
 
-
     public void explore(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(player.getPlayerName() + " va explorer !");
-        List<Hex> playerHexes = new ArrayList<>();
 
-        // Trouver les hexagones occupés par le joueur
+        List<Hex> playerHexes = new ArrayList<>();
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
@@ -223,88 +221,98 @@ public class CommandCard {
             return;
         }
 
-        afficherPlateau();
+        // Déterminer le nombre maximum de flottes pouvant être déplacées
+        int maxFleets = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            default -> 1;
+        };
 
-        Hex hexDepart = null;
-        while (hexDepart == null) {
-            System.out.println("Choisissez un hexagone de départ :");
-            for (int i = 0; i < playerHexes.size(); i++) {
-                System.out.println((i + 1) + ". " + playerHexes.get(i));
+        for (int fleet = 0; fleet < maxFleets; fleet++) {
+            afficherPlateau();
+
+            Hex hexDepart = null;
+            while (hexDepart == null) {
+                System.out.println("Choisissez un hexagone de départ :");
+                for (int i = 0; i < playerHexes.size(); i++) {
+                    System.out.println((i + 1) + ". " + playerHexes.get(i));
+                }
+
+                int choixDepart = -1;
+                while (choixDepart < 1 || choixDepart > playerHexes.size()) {
+                    try {
+                        System.out.print("Votre choix : ");
+                        choixDepart = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                        scanner.next();
+                    }
+                }
+
+                hexDepart = playerHexes.get(choixDepart - 1);
+                System.out.println("Vous avez choisi l'hexagone de départ : " + hexDepart);
+                System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
+                String confirmation = scanner.next();
+                if (!confirmation.equalsIgnoreCase("oui")) {
+                    hexDepart = null;
+                }
             }
 
-            int choixDepart = -1;
-            while (choixDepart < 1 || choixDepart > playerHexes.size()) {
+            List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
+            adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty()); // Exclure les hexagones occupés par d'autres joueurs
+
+            if (adjacentHexes.isEmpty()) {
+                System.out.println("Aucun hexagone adjacent valide pour explorer.");
+                continue;
+            }
+
+            Hex hexCible = null;
+            while (hexCible == null) {
+                System.out.println("Choisissez un hexagone cible :");
+                for (int i = 0; i < adjacentHexes.size(); i++) {
+                    System.out.println((i + 1) + ". " + adjacentHexes.get(i));
+                }
+
+                int choixCible = -1;
+                while (choixCible < 1 || choixCible > adjacentHexes.size()) {
+                    try {
+                        System.out.print("Votre choix : ");
+                        choixCible = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                        scanner.next();
+                    }
+                }
+
+                hexCible = adjacentHexes.get(choixCible - 1);
+                System.out.println("Vous avez choisi l'hexagone cible : " + hexCible);
+                System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
+                String confirmation = scanner.next();
+                if (!confirmation.equalsIgnoreCase("oui")) {
+                    hexCible = null;
+                }
+            }
+
+            // Demander combien de ships déplacer
+            int shipsToMove = 0;
+            int shipsAvailable = hexDepart.getOccupation().get(player);
+            System.out.println("Combien de bateaux voulez-vous déplacer ? (max : " + shipsAvailable + ")");
+            while (shipsToMove < 1 || shipsToMove > shipsAvailable) {
                 try {
                     System.out.print("Votre choix : ");
-                    choixDepart = scanner.nextInt();
+                    shipsToMove = scanner.nextInt();
                 } catch (InputMismatchException e) {
                     System.out.println("Entrée invalide. Veuillez entrer un nombre.");
                     scanner.next();
                 }
             }
 
-            hexDepart = playerHexes.get(choixDepart - 1);
-            System.out.println("Vous avez choisi l'hexagone de départ : " + hexDepart);
-            System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
-            String confirmation = scanner.next();
-            if (!confirmation.equalsIgnoreCase("oui")) {
-                hexDepart = null;
-            }
+            // Déplacer les ships
+            hexDepart.removeShip(player, shipsToMove);
+            hexCible.addShip(player, shipsToMove);
+
+            System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible);
         }
-
-        List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
-
-        if (adjacentHexes.isEmpty()) {
-            System.out.println("Aucun hexagone adjacent valide pour explorer.");
-            return;
-        }
-
-        Hex hexCible = null;
-        while (hexCible == null) {
-            System.out.println("Choisissez un hexagone cible :");
-            for (int i = 0; i < adjacentHexes.size(); i++) {
-                System.out.println((i + 1) + ". " + adjacentHexes.get(i));
-            }
-
-            int choixCible = -1;
-            while (choixCible < 1 || choixCible > adjacentHexes.size()) {
-                try {
-                    System.out.print("Votre choix : ");
-                    choixCible = scanner.nextInt();
-                } catch (InputMismatchException e) {
-                    System.out.println("Entrée invalide. Veuillez entrer un nombre.");
-                    scanner.next();
-                }
-            }
-
-            hexCible = adjacentHexes.get(choixCible - 1);
-            System.out.println("Vous avez choisi l'hexagone cible : " + hexCible);
-            System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
-            String confirmation = scanner.next();
-            if (!confirmation.equalsIgnoreCase("oui")) {
-                hexCible = null;
-            }
-        }
-
-        // Demander combien de ships déplacer
-        int shipsToMove = 0;
-        int shipsAvailable = hexDepart.getOccupation().get(player);
-        System.out.println("Combien de bateaux voulez-vous déplacer ? (max : " + shipsAvailable + ")");
-        while (shipsToMove < 1 || shipsToMove > shipsAvailable) {
-            try {
-                System.out.print("Votre choix : ");
-                shipsToMove = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Entrée invalide. Veuillez entrer un nombre.");
-                scanner.next();
-            }
-        }
-
-        // Déplacer les ships
-        hexDepart.removeShip(player, shipsToMove);
-        hexCible.addShip(player, shipsToMove);
-
-        System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible + ".");
     }
 
     public void vExplore(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
@@ -316,120 +324,152 @@ public class CommandCard {
             return;
         }
 
-        Hex hexDepart = ownedHexes.get(random.nextInt(ownedHexes.size())); // Choix aléatoire de départ
-        List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
+        int maxFleets = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            default -> 1;
+        };
 
-        // Filtrer les hexagones adjacents non occupés
-        adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty());
+        for (int fleet = 0; fleet < maxFleets; fleet++) {
+            if (ownedHexes.isEmpty()) break;
 
-        if (adjacentHexes.isEmpty()) {
-            System.out.println("Aucun hexagone adjacent valide pour explorer.");
-            return;
+            Hex hexDepart = ownedHexes.get(random.nextInt(ownedHexes.size())); // Choix aléatoire de départ
+            List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
+
+            // Filtrer les hexagones adjacents non occupés
+            adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty());
+
+            if (adjacentHexes.isEmpty()) {
+                System.out.println("Aucun hexagone adjacent valide pour explorer.");
+                continue;
+            }
+
+            Hex hexCible = adjacentHexes.get(random.nextInt(adjacentHexes.size())); // Choix aléatoire de cible
+            int shipsToMove = random.nextInt(hexDepart.getOccupation().get(player)) + 1; // Déplacer 1 à tous les bateaux disponibles
+
+            hexDepart.removeShip(player, shipsToMove);
+            hexCible.addShip(player, shipsToMove);
+
+            System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible);
         }
-
-        Hex hexCible = adjacentHexes.get(random.nextInt(adjacentHexes.size())); // Choix aléatoire de cible
-        int shipsToMove = random.nextInt(hexDepart.getOccupation().get(player)) + 1; // Déplacer 1 à tous les bateaux disponibles
-
-        hexDepart.removeShip(player, shipsToMove);
-        hexCible.addShip(player, shipsToMove);
-
-        System.out.println(player.getPlayerName() + " a déplacé " + shipsToMove + " bateau(x) de " + hexDepart + " à " + hexCible);
     }
 
     public void invade(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(player.getPlayerName() + " prépare une invasion !");
-        List<Hex> enemyHexes = new ArrayList<>();
 
-        // Trouver les hexagones ennemis
-        for (String niveau : plateau.keySet()) {
-            for (SectorCard sector : plateau.get(niveau)) {
-                for (Hex hex : sector.getHex().values()) {
-                    if (!hex.getOccupation().isEmpty() && !hex.getOccupation().containsKey(player)) {
-                        enemyHexes.add(hex);
+        // Déterminer le nombre maximum de systèmes pouvant être envahis
+        int maxInvasions = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            default -> 1;
+        };
+
+        for (int invasion = 0; invasion < maxInvasions; invasion++) {
+            List<Hex> enemyHexes = new ArrayList<>();
+
+            // Trouver les hexagones ennemis
+            for (String niveau : plateau.keySet()) {
+                for (SectorCard sector : plateau.get(niveau)) {
+                    for (Hex hex : sector.getHex().values()) {
+                        if (!hex.getOccupation().isEmpty() && !hex.getOccupation().containsKey(player)) {
+                            enemyHexes.add(hex);
+                        }
                     }
                 }
             }
-        }
 
-        if (enemyHexes.isEmpty()) {
-            System.out.println("Aucun hexagone ennemi trouvé pour l'invasion.");
-            return;
-        }
-
-        Hex hexCible = null;
-        while (hexCible == null) {
-            System.out.println("Choisissez un hexagone à envahir :");
-            for (int i = 0; i < enemyHexes.size(); i++) {
-                System.out.println((i + 1) + ". " + enemyHexes.get(i));
+            if (enemyHexes.isEmpty()) {
+                System.out.println("Aucun hexagone ennemi trouvé pour l'invasion.");
+                break; // Arrêter si aucun hexagone à envahir
             }
 
-            int choix = -1;
-            while (choix < 1 || choix > enemyHexes.size()) {
+            Hex hexCible = null;
+            while (hexCible == null) {
+                System.out.println("Choisissez un hexagone à envahir :");
+                for (int i = 0; i < enemyHexes.size(); i++) {
+                    System.out.println((i + 1) + ". " + enemyHexes.get(i));
+                }
+
+                int choix = -1;
+                while (choix < 1 || choix > enemyHexes.size()) {
+                    try {
+                        System.out.print("Votre choix : ");
+                        choix = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+                        scanner.next();
+                    }
+                }
+
+                hexCible = enemyHexes.get(choix - 1);
+                System.out.println("Vous avez choisi d'envahir l'hexagone : " + hexCible);
+                System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
+                String confirmation = scanner.next();
+                if (!confirmation.equalsIgnoreCase("oui")) {
+                    hexCible = null;
+                }
+            }
+
+            // Déterminer les forces à utiliser
+            int shipsToUse = 0;
+            int shipsAvailable = player.getShipNumber();
+            System.out.println("Combien de vaisseaux voulez-vous utiliser pour l'attaque ? (max : " + shipsAvailable + ")");
+            while (shipsToUse < 1 || shipsToUse > shipsAvailable) {
                 try {
                     System.out.print("Votre choix : ");
-                    choix = scanner.nextInt();
+                    shipsToUse = scanner.nextInt();
                 } catch (InputMismatchException e) {
                     System.out.println("Entrée invalide. Veuillez entrer un nombre.");
                     scanner.next();
                 }
             }
 
-            hexCible = enemyHexes.get(choix - 1);
-            System.out.println("Vous avez choisi d'envahir l'hexagone : " + hexCible);
-            System.out.print("Confirmez-vous ce choix ? (oui/non) : ");
-            String confirmation = scanner.next();
-            if (!confirmation.equalsIgnoreCase("oui")) {
-                hexCible = null;
-            }
+            // Ajouter les forces attaquantes à l'hexagone cible
+            hexCible.addShip(player, shipsToUse);
+            player.setShipNumber(player.getShipNumber() - shipsToUse);
+            System.out.println(player.getPlayerName() + " a envoyé " + shipsToUse + " vaisseaux pour envahir " + hexCible);
         }
-
-        // Demander le nombre de ships à utiliser pour l'attaque
-        int shipsToUse = 0;
-        System.out.println("Combien de vaisseaux voulez-vous utiliser pour l'attaque ? (max : " + 10 + ")");
-        while (shipsToUse < 1 || shipsToUse > 10) {
-            try {
-                System.out.print("Votre choix : ");
-                shipsToUse = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Entrée invalide. Veuillez entrer un nombre.");
-                scanner.next();
-            }
-        }
-
-        // Ajouter les forces attaquantes à l'hexagone cible
-        hexCible.addShip(player, shipsToUse);
-        System.out.println(player.getPlayerName() + " a envoyé " + shipsToUse + " vaisseaux pour envahir " + hexCible);
 
         // La résolution du combat sera gérée par la méthode `checkPlateau`
-        System.out.println("Combat ajouté à l'hexagone. Résolution à la fin du tour.");
+        System.out.println("Tous les combats seront résolus à la fin du tour.");
     }
 
     public void vInvade(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
         System.out.println(player.getPlayerName() + " prépare une invasion !");
-        List<Hex> enemyHexes = player.getEnemyHexes(plateau);
 
-        // Vérifier si des hexagones ennemis sont disponibles
-        if (enemyHexes.isEmpty()) {
-            System.out.println(player.getPlayerName() + " n'a aucun hexagone cible à envahir.");
-            return;
+        // Déterminer le nombre maximum de systèmes pouvant être envahis
+        int maxInvasions = switch (this.power) {
+            case 1 -> 3;
+            case 2 -> 2;
+            default -> 1;
+        };
+
+        for (int invasion = 0; invasion < maxInvasions; invasion++) {
+            List<Hex> enemyHexes = player.getEnemyHexes(plateau);
+
+            if (enemyHexes.isEmpty()) {
+                System.out.println(player.getPlayerName() + " n'a aucun hexagone cible à envahir.");
+                break; // Arrêter si aucun hexagone à envahir
+            }
+
+            // Choisir un hexagone ennemi de manière aléatoire
+            Hex hexCible = enemyHexes.get(random.nextInt(enemyHexes.size()));
+
+            // Déterminer les forces à utiliser
+            int shipsToUse = random.nextInt(10) + 1; // Nombre aléatoire entre 1 et 10
+
+            // Ajouter les forces attaquantes à l'hexagone cible
+            hexCible.addShip(player, shipsToUse);
+            System.out.println(player.getPlayerName() + " a attaqué " + hexCible + " avec " + shipsToUse + " vaisseaux.");
         }
 
-        // Choisir un hexagone ennemi de manière aléatoire
-        Hex hexCible = enemyHexes.get(random.nextInt(enemyHexes.size()));
-
-        // Déterminer le nombre de vaisseaux à utiliser pour l'invasion (au moins 1)
-        int shipsToUse = random.nextInt(10) + 1;
-
-        // Ajouter les forces attaquantes à l'hexagone cible
-        hexCible.addShip(player, shipsToUse);
-        System.out.println(player.getPlayerName() + " a attaqué " + hexCible + " avec " + shipsToUse + " vaisseaux.");
-
         // La résolution du combat sera gérée par la méthode `checkPlateau`
-        System.out.println("Combat ajouté à l'hexagone. Résolution à la fin du tour.");
+        System.out.println("Tous les combats seront résolus à la fin du tour.");
     }
 
     public void executeCard(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        System.out.println("Exécution de la carte " + id + " pour " + player.getPlayerName() + " avec le power " + power);
         if (player instanceof VirtualPlayer) {
             if (id == 1) { // Expand
                 vExpend((VirtualPlayer) player, plateau);

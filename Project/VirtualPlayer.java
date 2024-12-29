@@ -5,10 +5,21 @@ import java.util.*;
 public class VirtualPlayer extends Player {
     private Random random;
     private List<CommandCard> card;
+    private int shipNbr;
 
     public VirtualPlayer(String playerName, int points) {
         super(playerName, points);
         this.random = new Random();
+        this.card = new ArrayList<>();
+        this.shipNbr = 15;
+    }
+
+    @Override
+    public List<CommandCard> getCards() {
+        if (card == null) {
+            card = new ArrayList<>(); // Éviter un NullPointerException
+        }
+        return card;
     }
 
     @Override
@@ -26,12 +37,8 @@ public class VirtualPlayer extends Player {
             }
         }
 
-        this.card = order; // Assurez-vous de mettre à jour l'attribut cards
-        if (this.card.isEmpty()) {
-            System.out.println(getPlayerName() + " n'a pas pu sélectionner de cartes."); // Debug
-        } else {
-            System.out.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
-        }
+        this.card = order; // Mettre à jour l'attribut `card`
+        System.out.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
     }
 
     @Override
