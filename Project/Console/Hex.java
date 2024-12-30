@@ -82,6 +82,15 @@ public class Hex {
         return sb.toString();
     }
 
+    public boolean hasAdjacentHexWithPlayer(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        for (Hex adjacent : this.rexAdjacent(plateau)) {
+            if (adjacent.getOccupation().containsKey(player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addShip(Player player, int number) {
         occupation.put(player, occupation.getOrDefault(player, 0) + number);
     }

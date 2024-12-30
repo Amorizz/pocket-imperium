@@ -1,7 +1,9 @@
 package Project.GUI;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Plateau {
@@ -66,26 +68,43 @@ public class Plateau {
             for (SectorCard sector : sectors) {
                 HashMap<Integer, Hex> hexagones = (HashMap<Integer, Hex>) sector.getHex(); // Obtenir tous les hexagones du secteur
                 for (Hex hex : hexagones.values()) {
+                    int hexId = hex.getId(); // Obtenir l'ID de l'hexagone
+
                     if (!hex.getOccupation().isEmpty()) {
                         // Vérifier si plusieurs joueurs occupent l'hexagone
                         if (hex.getOccupation().size() > 1) {
-                            console.println("Conflit détecté dans l'hexagone " + hex);
+                            console.println("Conflit détecté dans l'hexagone " + hexId);
                             resolveConflict(hex);
                         }
 
                         // Ajuster le nombre de vaisseaux pour respecter la capacité maximale
-                        Player occupant = hex.getOccupation().keySet().iterator().next(); // Obtenir le seul occupant
-                        int ships = hex.getOccupation().get(occupant);
-                        if (ships > hex.getMaxshipon()) {
-                            hex.getOccupation().put(occupant, hex.getMaxshipon()); // Limiter au maximum permis
-                            console.println("Nombre de vaisseaux ajusté pour " + occupant.getPlayerName() + " dans l'hexagone " + hex);
+                        for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
+                            Player occupant = entry.getKey();
+                            int ships = entry.getValue();
+                            if (ships > hex.getMaxshipon()) {
+                                hex.getOccupation().put(occupant, hex.getMaxshipon()); // Limiter au maximum permis
+                                console.println("Nombre de vaisseaux ajusté pour " + occupant.getPlayerName() + " dans l'hexagone " + hexId);
+                            }
                         }
                     }
+
+                    // Mettre à jour la carte graphique avec les bateaux restants
+                    List<Color> updatedColors = new ArrayList<>();
+                    for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
+                        Player occupant = entry.getKey();
+                        int ships = entry.getValue();
+                        for (int i = 0; i < ships; i++) {
+                            updatedColors.add(console.getColorFromName(occupant.getColor())); // Convertir la couleur en `Color`
+                        }
+                    }
+                    console.updateHexShips(hexId, updatedColors); // Mettre à jour l'affichage des bateaux
                 }
             }
         }
-        System.out.println("Vérification du plateau terminée.");
+
+        console.println("Vérification du plateau terminée.");
     }
+
 
     public void assignHexIds() {
         int idCounter = 1; // Compteur pour les identifiants
@@ -97,6 +116,20 @@ public class Plateau {
             }
         }
     }
+
+    public int getLevel(int hexId) {
+        for (String niveau : jeux.keySet()) {
+            for (SectorCard sector : jeux.get(niveau)) {
+                for (Hex hex : sector.getHex().values()) {
+                    if (hex.getId() == hexId) {
+                        return hex.getLevel(); // Retourne le niveau de l'hexagone
+                    }
+                }
+            }
+        }
+        return 0; // Si aucun niveau trouvé
+    }
+
 
     private void resolveConflict(Hex hex) {
         // Trouver le joueur avec le plus de vaisseaux

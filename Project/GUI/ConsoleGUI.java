@@ -2,8 +2,6 @@ package Project.GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 import java.awt.Color;
@@ -12,15 +10,18 @@ public class ConsoleGUI extends JFrame {
     private JTextArea textArea;
     private JTextField inputField;
     private JButton sendButton;
+    private Plateau plateau;
 
     private final HashMap<Integer, Polygon> hexagonMap = new HashMap<>();
     private final HashMap<Integer, List<Color>> hexShips = new HashMap<>();
 
-    public ConsoleGUI() {
+    public ConsoleGUI(Plateau plateau) {
         setTitle("Pocket Imperium");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 600);
+        setSize(1500, 800);
         setLayout(new BorderLayout());
+
+        this.plateau = plateau;
 
         textArea = new JTextArea();
         textArea.setEditable(false);
@@ -45,6 +46,21 @@ public class ConsoleGUI extends JFrame {
         setVisible(true);
     }
 
+    public void updateHexShips(int hexId, List<Color> colors) {
+        hexShips.put(hexId, colors); // Mettre à jour les bateaux sur l'hexagone
+        repaint(); // Redessiner le plateau
+    }
+
+    public java.awt.Color getColorFromName(String colorName) {
+        return switch (colorName.toLowerCase()) {
+            case "rouge" -> Color.RED;
+            case "bleu" -> Color.BLUE;
+            case "vert" -> Color.GREEN;
+            case "jaune" -> Color.YELLOW;
+            default -> Color.GRAY; // Couleur par défaut si inconnue
+        };
+    }
+
     private JPanel createGameBoardPanel() {
         JPanel gameBoardPanel = new JPanel() {
             @Override
@@ -59,33 +75,56 @@ public class ConsoleGUI extends JFrame {
                 int sectionWidth = (getWidth() - 2 * margin) / 3;
                 int sectionHeight = (getHeight() - 2 * margin) / 3;
                 int hexSize = 40;
-                int yOffset = margin;
 
                 int hexCounter = 1;
 
                 for (int row = 0; row < 3; row++) {
                     int xOffset = margin;
                     for (int col = 0; col < 3; col++) {
-                        hexCounter = drawHexagons(g2d, xOffset, yOffset, hexSize, hexCounter);
-                        xOffset += sectionWidth; // Décalage horizontal
+                        if (col == 1 && row == 1) {
+                            // Section centrale
+                            hexCounter = drawCenterSectionHexes(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                        } else if (row == 1 && col != 1) {
+                            // Sections gauche et droite
+                            hexCounter = drawSideSectionHexes(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                        } else {
+                            // Sections haut, bas
+                            hexCounter = drawHexagons(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                        }
+                        xOffset += sectionWidth;
                     }
-                    yOffset += sectionHeight; // Décalage vertical
                 }
 
                 drawBlueLines(g2d, sectionWidth, sectionHeight, margin);
             }
 
-            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+            private int drawSideSectionHexes(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
                 int[][] positions = {
-                        {1, 0}, {3, 0},
-                        {0, 1}, {2, 1}, {4, 1},
-                        {1, 2}, {3, 2}
+                        {1, 0}, {3, 0}, {5, 0},  // Ligne 1
+                        {2, 1}, {4, 1},          // Ligne 2
+                        {1, 2}, {3, 2}, {5, 2}   // Ligne 3
                 };
 
+                return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
+            }
+
+            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+                int[][] positions = {
+                        {1, 0}, {3, 0},  // Ligne 1
+                        {0, 1}, {2, 1}, {4, 1},  // Ligne 2
+                        {1, 2}, {3, 2}   // Ligne 3
+                };
+
+                int horizontalSpacing = hexSize + 10;  // Ajustement pour espacer horizontalement
+                int verticalSpacing = (int) (hexSize * 1.5);  // Ajustement pour espacer verticalement
+                int sectionHorizontalCentering = (getWidth() / 3 - (4 * horizontalSpacing)) / 2;
+                int sectionVerticalCentering = (getHeight() / 3 - (3 * verticalSpacing)) / 2;
+
                 int level = startLevel;
+
                 for (int[] pos : positions) {
-                    int x = xOffset + pos[0] * (hexSize + 5);
-                    int y = yOffset + pos[1] * (int) (hexSize * 0.75);
+                    int x = xOffset + sectionHorizontalCentering + pos[0] * horizontalSpacing;
+                    int y = yOffset + sectionVerticalCentering + pos[1] * verticalSpacing;
 
                     Polygon hexagon = createHexagon(x, y, hexSize);
                     g2d.setColor(Color.GRAY);
@@ -99,16 +138,89 @@ public class ConsoleGUI extends JFrame {
                         drawShipsInHex(g2d, x, y, hexSize, ships);
                     }
 
-                    // Afficher l'ID au centre
+                    // Récupérer le niveau depuis le plateau
+                    int  hexLevel = plateau.getLevel(level); // Vous devez implémenter getLevel dans Plateau
+
+                    // Afficher l'ID et le niveau
                     g2d.setColor(Color.BLACK);
-                    String levelText = String.valueOf(level);
+                    String hexIdText = String.valueOf(level); // ID
+                    String levelText = "Lvl: " + hexLevel; // Niveau
+
                     FontMetrics metrics = g2d.getFontMetrics();
-                    int textX = x - metrics.stringWidth(levelText) / 2;
-                    int textY = y + metrics.getHeight() / 4;
-                    g2d.drawString(levelText, textX, textY);
+
+                    // Positionnement de l'ID
+                    int idTextX = x - metrics.stringWidth(hexIdText) / 2;
+                    int idTextY = y;
+
+                    // Positionnement du niveau
+                    int levelTextX = x - metrics.stringWidth(levelText) / 2;
+                    int levelTextY = y + metrics.getHeight() + 5;
+
+                    g2d.drawString(hexIdText, idTextX, idTextY); // Dessiner l'ID
+                    g2d.drawString(levelText, levelTextX, levelTextY); // Dessiner le niveau
 
                     level++;
                 }
+
+                return level;
+            }
+
+            private int drawCenterSectionHexes(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+                int[][] positions = {
+                        {1, 0}, {3, 0},  // Ligne du haut : 2 hexagones
+                        {2, 1},          // Ligne du milieu : 1 hexagone
+                        {1, 2}, {3, 2}   // Ligne du bas : 2 hexagones
+                };
+
+                return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
+            }
+
+
+            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel, int[][] positions) {
+                int horizontalSpacing = hexSize + 10;
+                int verticalSpacing = (int) (hexSize * 1.5);
+                int level = startLevel;
+
+                for (int[] pos : positions) {
+                    int x = xOffset + pos[0] * horizontalSpacing;
+                    int y = yOffset + pos[1] * verticalSpacing;
+
+                    Polygon hexagon = createHexagon(x, y, hexSize);
+                    g2d.setColor(Color.GRAY);
+                    g2d.fill(hexagon);
+
+                    hexagonMap.put(level, hexagon);
+
+                    // Dessiner les bateaux présents
+                    List<Color> ships = hexShips.get(level);
+                    if (ships != null) {
+                        drawShipsInHex(g2d, x, y, hexSize, ships);
+                    }
+
+                    // Récupérer le niveau depuis le plateau
+                    int hexLevel = plateau.getLevel(level); // Vous devez implémenter getLevel dans Plateau
+
+                    // Afficher l'ID et le niveau
+                    g2d.setColor(Color.BLACK);
+                    String hexIdText = String.valueOf(level); // ID
+                    String levelText = "Lvl: " + hexLevel; // Niveau
+
+                    FontMetrics metrics = g2d.getFontMetrics();
+
+                    // Positionnement de l'ID
+                    int idTextX = x - metrics.stringWidth(hexIdText) / 2;
+                    int idTextY = y;
+
+                    // Positionnement du niveau
+                    int levelTextX = x - metrics.stringWidth(levelText) / 2;
+                    int levelTextY = y + metrics.getHeight() + 5;
+
+                    g2d.drawString(hexIdText, idTextX, idTextY); // Dessiner l'ID
+                    g2d.drawString(levelText, levelTextX, levelTextY); // Dessiner le niveau
+
+                    level++;
+                }
+
                 return level;
             }
 
@@ -180,6 +292,40 @@ public class ConsoleGUI extends JFrame {
 
         hexShips.computeIfAbsent(hexId, k -> new ArrayList<>()).add(color);
         repaint();
+    }
+
+    public void removeShipsFromHex(int hexId, String colorName) {
+        // Convertir le nom de la couleur en objet Color
+        Color color;
+        switch (colorName.toLowerCase()) {
+            case "rouge":
+                color = Color.RED;
+                break;
+            case "bleu":
+                color = Color.BLUE;
+                break;
+            case "vert":
+                color = Color.GREEN;
+                break;
+            case "jaune":
+                color = Color.YELLOW;
+                break;
+            default:
+                color = Color.GRAY; // Couleur par défaut si non reconnue
+                break;
+        }
+
+        // Vérifier si des bateaux existent sur cet hexagone
+        if (hexShips.containsKey(hexId)) {
+            List<Color> ships = hexShips.get(hexId);
+            ships.removeIf(shipColor -> shipColor.equals(color)); // Supprimer tous les bateaux de la couleur donnée
+
+            if (ships.isEmpty()) {
+                hexShips.remove(hexId); // Supprimer l'entrée si plus de bateaux sur l'hexagone
+            }
+        }
+
+        repaint(); // Redessiner le plateau
     }
 
     public void println(String text) {

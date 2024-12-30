@@ -20,6 +20,16 @@ public class Hex {
         this.id = id;
     }
 
+    public boolean hasAdjacentHexWithPlayer(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
+        for (Hex adjacent : this.rexAdjacent(plateau)) {
+            if (adjacent.getOccupation().containsKey(player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public int getId() {
         return id;
     }
