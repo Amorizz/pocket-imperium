@@ -57,17 +57,28 @@ public class VirtualPlayer extends Player {
 
     @Override
     public void firstShip(Plateau plateau, ConsoleGUI console) {
-        console.println(getPlayerName() + " place son premier bateau.");
-        List<Hex> validHexes = getValidHexes(plateau.getPlateau());
+        console.println(getPlayerName() + " place un bateau aléatoirement dans un hexagone.");
 
-        if (validHexes.isEmpty()) {
-            console.println("Aucun hexagone disponible pour placer le premier bateau.");
+        List<Hex> availableHexes = new ArrayList<>();
+        for (String niveau : plateau.getPlateau().keySet()) {
+            for (SectorCard sector : plateau.getPlateau().get(niveau)) {
+                availableHexes.addAll(sector.getHex().values());
+            }
+        }
+
+        if (availableHexes.isEmpty()) {
+            console.println("Aucun hexagone disponible pour placer un bateau.");
             return;
         }
 
-        Hex selectedHex = validHexes.get(random.nextInt(validHexes.size())); // Choix aléatoire
-        selectedHex.addShip(this, 1); // Ajouter un bateau pour le joueur
-        console.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
+        // Sélectionner un hexagone aléatoire
+        Hex selectedHex = availableHexes.get(new Random().nextInt(availableHexes.size()));
+        selectedHex.addShip(this, 1);
+
+        // Ajouter visuellement un point dans l'hexagone
+        console.placeShipInHex(selectedHex.getId(), getColor());
+
+        console.println(getPlayerName() + " a placé un bateau sur l'hexagone : " + selectedHex.getId());
     }
 
 

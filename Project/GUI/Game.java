@@ -162,6 +162,7 @@ public class Game {
         Game game = Game.getInstance();
         Plateau jeux = new Plateau();
         ConsoleGUI console = new ConsoleGUI();
+        jeux.assignHexIds(); // Attribuer des identifiants uniques à chaque hexagone
 
         int nombreJoueurs = -1;
 

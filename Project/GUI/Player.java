@@ -115,7 +115,10 @@ public class Player {
             }
         }
 
+        console.placeShipInHex(selectedHex.getId(), getColor());
+
         selectedHex.addShip(this, 1);
+        System.out.println(getColor());
         console.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
     }
 

@@ -87,6 +87,17 @@ public class Plateau {
         System.out.println("Vérification du plateau terminée.");
     }
 
+    public void assignHexIds() {
+        int idCounter = 1; // Compteur pour les identifiants
+        for (String niveau : jeux.keySet()) {
+            for (SectorCard sector : jeux.get(niveau)) {
+                for (Hex hex : sector.getHex().values()) {
+                    hex.setId(idCounter++); // Attribuer un identifiant unique
+                }
+            }
+        }
+    }
+
     private void resolveConflict(Hex hex) {
         // Trouver le joueur avec le plus de vaisseaux
         Map<Player, Integer> occupation = hex.getOccupation();

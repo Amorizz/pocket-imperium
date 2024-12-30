@@ -2,7 +2,10 @@ package Project.GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Path2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.List;
 import java.awt.Color;
 
 public class ConsoleGUI extends JFrame {
@@ -10,35 +13,32 @@ public class ConsoleGUI extends JFrame {
     private JTextField inputField;
     private JButton sendButton;
 
+    private final HashMap<Integer, Polygon> hexagonMap = new HashMap<>();
+    private final HashMap<Integer, List<Color>> hexShips = new HashMap<>();
+
     public ConsoleGUI() {
-        // Configuration de la fenêtre principale
         setTitle("Pocket Imperium");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 600);
         setLayout(new BorderLayout());
 
-        // Zone de texte pour afficher les messages
         textArea = new JTextArea();
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(600, 600));
 
-        // Zone de saisie et bouton "Send"
         JPanel inputPanel = new JPanel(new BorderLayout());
         inputField = new JTextField();
         sendButton = new JButton("Send");
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
 
-        // Ajouter la zone de texte et la zone de saisie à gauche
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(scrollPane, BorderLayout.CENTER);
         leftPanel.add(inputPanel, BorderLayout.SOUTH);
 
-        // Plateau de jeu à droite
         JPanel gameBoardPanel = createGameBoardPanel();
 
-        // Ajouter les panneaux gauche et droit
         add(leftPanel, BorderLayout.WEST);
         add(gameBoardPanel, BorderLayout.CENTER);
 
@@ -52,18 +52,97 @@ public class ConsoleGUI extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // Fond noir
                 g2d.setColor(Color.BLACK);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
 
-                int margin = 20; // Marge autour du plateau
+                int margin = 20;
                 int sectionWidth = (getWidth() - 2 * margin) / 3;
                 int sectionHeight = (getHeight() - 2 * margin) / 3;
-                int hexSize = 30; // Taille des hexagones
-                int internalMarginX = (sectionWidth - 5 * hexSize) / 2; // Ajustement horizontal
-                int internalMarginY = (sectionHeight - 3 * (int) (1.5 * hexSize)) / 2 + 10; // Ajustement vertical
+                int hexSize = 40;
+                int yOffset = margin;
 
-                // Lignes bleues pour diviser les sections
+                int hexCounter = 1;
+
+                for (int row = 0; row < 3; row++) {
+                    int xOffset = margin;
+                    for (int col = 0; col < 3; col++) {
+                        hexCounter = drawHexagons(g2d, xOffset, yOffset, hexSize, hexCounter);
+                        xOffset += sectionWidth; // Décalage horizontal
+                    }
+                    yOffset += sectionHeight; // Décalage vertical
+                }
+
+                drawBlueLines(g2d, sectionWidth, sectionHeight, margin);
+            }
+
+            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+                int[][] positions = {
+                        {1, 0}, {3, 0},
+                        {0, 1}, {2, 1}, {4, 1},
+                        {1, 2}, {3, 2}
+                };
+
+                int level = startLevel;
+                for (int[] pos : positions) {
+                    int x = xOffset + pos[0] * (hexSize + 5);
+                    int y = yOffset + pos[1] * (int) (hexSize * 0.75);
+
+                    Polygon hexagon = createHexagon(x, y, hexSize);
+                    g2d.setColor(Color.GRAY);
+                    g2d.fill(hexagon);
+
+                    hexagonMap.put(level, hexagon);
+
+                    // Dessiner les bateaux présents
+                    List<Color> ships = hexShips.get(level);
+                    if (ships != null) {
+                        drawShipsInHex(g2d, x, y, hexSize, ships);
+                    }
+
+                    // Afficher l'ID au centre
+                    g2d.setColor(Color.BLACK);
+                    String levelText = String.valueOf(level);
+                    FontMetrics metrics = g2d.getFontMetrics();
+                    int textX = x - metrics.stringWidth(levelText) / 2;
+                    int textY = y + metrics.getHeight() / 4;
+                    g2d.drawString(levelText, textX, textY);
+
+                    level++;
+                }
+                return level;
+            }
+
+            private void drawShipsInHex(Graphics2D g2d, int x, int y, int hexSize, List<Color> ships) {
+                int pointSize = 6;
+                int padding = 3;
+                int pointsPerRow = (hexSize - padding) / (pointSize + padding);
+                int rowOffset = 0;
+
+                for (int i = 0; i < ships.size(); i++) {
+                    int col = i % pointsPerRow;
+                    if (i > 0 && i % pointsPerRow == 0) {
+                        rowOffset++;
+                    }
+                    int px = x - (pointsPerRow / 2 * (pointSize + padding)) + col * (pointSize + padding);
+                    int py = y + rowOffset * (pointSize + padding);
+
+                    g2d.setColor(ships.get(i));
+                    g2d.fillOval(px, py, pointSize, pointSize);
+                }
+            }
+
+            private Polygon createHexagon(int x, int y, int size) {
+                Polygon hexagon = new Polygon();
+                double angle = Math.PI / 3;
+                for (int i = 0; i < 6; i++) {
+                    int x1 = (int) (x + size * Math.cos(angle * i));
+                    int y1 = (int) (y + size * Math.sin(angle * i));
+                    hexagon.addPoint(x1, y1);
+                }
+                return hexagon;
+            }
+
+            private void drawBlueLines(Graphics2D g2d, int sectionWidth, int sectionHeight, int margin) {
                 g2d.setColor(Color.BLUE);
                 for (int i = 1; i < 3; i++) {
                     int x = i * sectionWidth + margin;
@@ -72,101 +151,6 @@ public class ConsoleGUI extends JFrame {
                     int y = i * sectionHeight + margin;
                     g2d.drawLine(margin, y, getWidth() - margin, y);
                 }
-
-                // Dessiner les hexagones et leurs niveaux
-                int hexCounter = 1; // Pour donner un niveau unique à chaque hexagone
-                for (int row = 0; row < 3; row++) {
-                    for (int col = 0; col < 3; col++) {
-                        int xOffset = col * sectionWidth + margin + internalMarginX;
-                        int yOffset = row * sectionHeight + margin + internalMarginY;
-
-                        if (row == 0 || row == 2) {
-                            hexCounter = drawHexagonsTopBottom(g2d, xOffset, yOffset, hexSize, hexCounter);
-                        } else {
-                            if (col == 0 || col == 2) {
-                                hexCounter = drawHexagonsMiddleSides(g2d, xOffset, yOffset, hexSize, hexCounter);
-                            } else {
-                                hexCounter = drawHexagonsMiddleCenter(g2d, xOffset, yOffset, hexSize, hexCounter);
-                            }
-                        }
-                    }
-                }
-            }
-
-            private int drawHexagonsTopBottom(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
-                g2d.setColor(Color.RED);
-                int[][] positions = {
-                        {1, 0}, {3, 0}, // Ligne 1 : 2 hexagones
-                        {0, 1}, {2, 1}, {4, 1}, // Ligne 2 : 3 hexagones
-                        {1, 2}, {3, 2}  // Ligne 3 : 2 hexagones
-                };
-
-                return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
-            }
-
-            private int drawHexagonsMiddleSides(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
-                g2d.setColor(Color.RED);
-                int[][] positions = {
-                        {0, 0}, {2, 0}, {4, 0}, // Ligne 1 : 3 hexagones
-                        {1, 1}, {3, 1},        // Ligne 2 : 2 hexagones
-                        {0, 2}, {2, 2}, {4, 2} // Ligne 3 : 3 hexagones
-                };
-
-                return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
-            }
-
-            private int drawHexagonsMiddleCenter(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
-                g2d.setColor(Color.RED);
-                int[][] positions = {
-                        {0, 0}, {4, 0}, // Haut-gauche et haut-droite
-                        {2, 1},        // Centre
-                        {0, 2}, {4, 2}  // Bas-gauche et bas-droite
-                };
-
-                return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
-            }
-
-            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel, int[][] positions) {
-                int level = startLevel;
-                g2d.setFont(new Font("Arial", Font.BOLD, 12));
-                g2d.setColor(Color.RED);
-
-                for (int[] pos : positions) {
-                    int x = xOffset + pos[0] * (hexSize + 5);
-                    int y = yOffset + pos[1] * (int) (hexSize * 1.5);
-
-                    // Dessiner l'hexagone
-                    Path2D hexagon = createHexagon(x, y, hexSize);
-                    g2d.fill(hexagon);
-
-                    // Afficher le niveau au centre
-                    g2d.setColor(Color.WHITE);
-                    String levelText = ""+level;
-                    FontMetrics metrics = g2d.getFontMetrics();
-                    int textX = x - metrics.stringWidth(levelText) / 2;
-                    int textY = y + metrics.getHeight() / 4;
-                    g2d.drawString(levelText, textX, textY);
-
-                    g2d.setColor(Color.RED); // Remet la couleur pour le prochain hexagone
-                    level++;
-                }
-                return level;
-            }
-
-            private Path2D createHexagon(int x, int y, int size) {
-                Path2D hexagon = new Path2D.Double();
-                double angle = Math.PI / 3;
-                for (int i = 0; i < 6; i++) {
-                    double x1 = x + size * Math.cos(angle * i);
-                    double y1 = y + size * Math.sin(angle * i);
-                    if (i == 0) {
-                        hexagon.moveTo(x1, y1);
-                    } else {
-                        hexagon.lineTo(x1, y1);
-                    }
-                }
-                hexagon.closePath();
-                return hexagon;
             }
         };
 
@@ -174,39 +158,58 @@ public class ConsoleGUI extends JFrame {
         return gameBoardPanel;
     }
 
+    public void placeShipInHex(int hexId, String colorName) {
+        Color color;
+        switch (colorName.toLowerCase()) {
+            case "rouge":
+                color = Color.RED;
+                break;
+            case "bleu":
+                color = Color.BLUE;
+                break;
+            case "vert":
+                color = Color.GREEN;
+                break;
+            case "jaune":
+                color = Color.YELLOW;
+                break;
+            default:
+                color = Color.GRAY;
+                break;
+        }
+
+        hexShips.computeIfAbsent(hexId, k -> new ArrayList<>()).add(color);
+        repaint();
+    }
+
     public void println(String text) {
         textArea.append(text + "\n");
     }
 
-    public String getInput() {
-        return inputField.getText();
-    }
-
-    public JButton getSendButton() {
-        return sendButton;
-    }
-
     public String getInputSync() {
-        final String[] input = new String[1];
         final Object lock = new Object();
+        final String[] input = new String[1];
+        input[0] = null;
 
         sendButton.addActionListener(e -> {
             synchronized (lock) {
-                input[0] = inputField.getText();
-                inputField.setText(""); // Réinitialiser le champ
-                lock.notify(); // Notifie le thread principal que l'entrée est prête
+                input[0] = inputField.getText().trim();
+                inputField.setText("");
+                lock.notify();
             }
         });
 
-        try {
-            synchronized (lock) {
-                lock.wait(); // Attend que l'utilisateur entre une valeur
+        synchronized (lock) {
+            try {
+                while (input[0] == null) {
+                    lock.wait();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return null;
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
 
         return input[0];
     }
-
 }

@@ -8,12 +8,22 @@ public class Hex {
     private final int maxShipOn;
     private final int level;
     private Map<Player, Integer> occupation;
+    private int id;
 
     public Hex(int level) {
         this.level = level;
         this.maxShipOn = level + 1;
         this.occupation = new HashMap<>();
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
 
     public void reLoc(boolean triPrime, boolean bottom, boolean top, int place, int number) {
         if (triPrime) {
