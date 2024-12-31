@@ -2,23 +2,46 @@ package Project.Console;
 
 import java.util.*;
 
+/**
+ * La classe {@code CommandCard} représente une carte de commande utilisée par les joueurs dans le jeu.
+ * Chaque carte possède un ID, une puissance (power), et est associée à une des trois commandes principales :
+ * Expand, Explore, et Invade. Ces cartes permettent aux joueurs d'effectuer différentes actions stratégiques.
+ */
 public class CommandCard {
-    private int id;
-    private int power = 1;
-    private final Random random = new Random(); // Générateur aléatoire partagé
+    private int id; // Identifiant unique de la carte
+    private int power = 1;// Puissance de la carte (varie en fonction des joueurs utilisant la même commande)
+    private final Random random = new Random(); // Générateur aléatoire pour les actions virtuelles
 
+    /**
+     * Constructeur de la classe {@code CommandCard}.
+     *
+     * @param id l'identifiant unique de la carte (1 : Expand, 2 : Explore, 3 : Invade).
+     */
     public CommandCard(int id) {
         this.id = id;
     }
 
+    /**
+     * Retourne l'ID de la carte.
+     *
+     * @return l'identifiant unique de la carte.
+     */
     public int getId() {
         return this.id;
     }
 
+    /**
+     * Définit la puissance de la carte en fonction du nombre de joueurs ayant choisi la même commande.
+     *
+     * @param power la nouvelle puissance de la carte (comprise entre 1 et 3).
+     */
     public void setPower(int power) {
         this.power = power;
     }
 
+    /**
+     * Affiche une représentation textuelle du plateau pour aider les joueurs.
+     */
     private void afficherPlateau(){
         System.out.println(""+
         "  [ 1] [ 2] #  [ 8] [ 9] #  [15] [16]"+"\n"+
@@ -35,6 +58,12 @@ public class CommandCard {
         );
     }
 
+    /**
+     * Permet au joueur réel d'utiliser la commande Expand pour ajouter des vaisseaux sur les systèmes qu'il contrôle.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     */
     public void expand(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         int maxShipsToAdd = switch (this.power) {
             case 1 -> 3;
@@ -102,6 +131,12 @@ public class CommandCard {
         System.out.println("Extension terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Expand.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     */
     public void vExpend(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
         int maxShipsToAdd = switch (this.power) {
             case 1 -> 3;
@@ -147,6 +182,12 @@ public class CommandCard {
         System.out.println("Extension terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur réel d'utiliser la commande Explore pour déplacer des vaisseaux entre les hexagones.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones.
+     */
     public void explore(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(player.getPlayerName() + " va explorer !");
@@ -260,6 +301,12 @@ public class CommandCard {
         }
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Explore.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones.
+     */
     public void vExplore(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
         System.out.println(player.getPlayerName() + " va explorer !");
         List<Hex> ownedHexes = player.getOwnedHexes(plateau);
@@ -312,6 +359,12 @@ public class CommandCard {
         }
     }
 
+    /**
+     * Permet au joueur réel d'utiliser la commande Invade pour envahir des systèmes adjacents.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     */
     public void invade(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         Scanner scanner = new Scanner(System.in);
         System.out.println(player.getPlayerName() + " prépare une invasion !");
@@ -393,6 +446,12 @@ public class CommandCard {
         System.out.println("Invasion terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Invade.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     */
     public void vInvade(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau) {
         System.out.println(player.getPlayerName() + " prépare une invasion !");
 
@@ -442,6 +501,12 @@ public class CommandCard {
         System.out.println("Invasion terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Exécute la commande associée à cette carte, en fonction du joueur (réel ou virtuel) et de l'ID de la carte.
+     *
+     * @param player  le joueur qui utilise la carte.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     */
     public void executeCard(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
         System.out.println("Exécution de la carte " + id + " pour " + player.getPlayerName() + " avec le power " + power);
         if (player instanceof VirtualPlayer) {
@@ -468,6 +533,12 @@ public class CommandCard {
         }
     }
 
+    /**
+     * Vérifie si deux cartes sont égales, en se basant sur leur ID.
+     *
+     * @param obj l'objet à comparer.
+     * @return {@code true} si les deux cartes ont le même ID, {@code false} sinon.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -476,6 +547,11 @@ public class CommandCard {
         return id == that.id;
     }
 
+    /**
+     * Retourne le hashcode de la carte, basé sur son ID.
+     *
+     * @return le hashcode de la carte.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id);
