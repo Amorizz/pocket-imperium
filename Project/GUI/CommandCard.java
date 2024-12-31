@@ -149,22 +149,6 @@ public class CommandCard {
     public void explore(Player player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         console.println(player.getPlayerName() + " va explorer !");
 
-        List<Hex> playerHexes = new ArrayList<>();
-        for (String niveau : plateau.keySet()) {
-            for (SectorCard sector : plateau.get(niveau)) {
-                for (Hex hex : sector.getHex().values()) {
-                    if (hex.getOccupation().containsKey(player)) {
-                        playerHexes.add(hex);
-                    }
-                }
-            }
-        }
-
-        if (playerHexes.isEmpty()) {
-            console.println("Vous n'avez aucune flotte à déplacer.");
-            return;
-        }
-
         int maxFleets = switch (this.power) {
             case 1 -> 3;
             case 2 -> 2;
@@ -172,6 +156,22 @@ public class CommandCard {
         };
 
         for (int fleet = 0; fleet < maxFleets; fleet++) {
+            List<Hex> playerHexes = new ArrayList<>();
+            for (String niveau : plateau.keySet()) {
+                for (SectorCard sector : plateau.get(niveau)) {
+                    for (Hex hex : sector.getHex().values()) {
+                        if (hex.getOccupation().containsKey(player)) {
+                            playerHexes.add(hex);
+                        }
+                    }
+                }
+            }
+
+            if (playerHexes.isEmpty()) {
+                console.println("Vous n'avez aucune flotte à déplacer.");
+                return;
+            }
+
             console.println("Flotte " + (fleet + 1) + "/" + maxFleets);
             console.println("Choisissez un hexagone de départ parmi ceux que vous contrôlez :");
             for (int i = 0; i < playerHexes.size(); i++) {
@@ -291,7 +291,7 @@ public class CommandCard {
                         if (hex.getOccupation().containsKey(player)) {
                             // Ajouter les hexagones ennemis adjacents
                             for (Hex adjacentHex : hex.rexAdjacent(plateau)) {
-                                if (!adjacentHex.getOccupation().isEmpty() && !adjacentHex.getOccupation().containsKey(player)) {
+                                if (adjacentHex.getOccupation().size() != 0 && !adjacentHex.getOccupation().containsKey(player)) {
                                     adjacentEnemyHexes.add(adjacentHex);
                                 }
                             }
@@ -377,7 +377,7 @@ public class CommandCard {
                         if (hex.getOccupation().containsKey(player)) {
                             // Ajouter les hexagones ennemis adjacents
                             for (Hex adjacentHex : hex.rexAdjacent(plateau)) {
-                                if (!adjacentHex.getOccupation().isEmpty() && !adjacentHex.getOccupation().containsKey(player)) {
+                                if (adjacentHex.getOccupation().size() != 0 && !adjacentHex.getOccupation().containsKey(player)) {
                                     adjacentEnemyHexes.add(adjacentHex);
                                 }
                             }

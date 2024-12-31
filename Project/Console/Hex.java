@@ -82,15 +82,6 @@ public class Hex {
         return sb.toString();
     }
 
-    public boolean hasAdjacentHexWithPlayer(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
-        for (Hex adjacent : this.rexAdjacent(plateau)) {
-            if (adjacent.getOccupation().containsKey(player)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void addShip(Player player, int number) {
         occupation.put(player, occupation.getOrDefault(player, 0) + number);
     }
@@ -106,19 +97,9 @@ public class Hex {
         }
     }
 
-    public void clearOccupation(Player player) {
-        occupation.remove(player);
-    }
-
     public void clearAllOccupation() {
         this.occupation.clear();
     }
-
-    // Getters et Setters
-    public int getShipon() {
-        return occupation.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
 
     public int getMaxshipon() {
         return maxShipOn;
@@ -127,7 +108,6 @@ public class Hex {
     public Map<Player, Integer> getOccupation() {
         return occupation;
     }
-
 
     public int getLevel() {
         return level;
@@ -207,23 +187,5 @@ public class Hex {
         }
 
         return adjacents;
-    }
-
-
-    public boolean isAdjacent(Hex other, HashMap<String, ArrayList<SectorCard>> plateau) {
-        List<Hex> adjacentHexes = this.rexAdjacent(plateau); // Obtenir les hexagones adjacents
-        if (adjacentHexes.contains(other)) {
-            return true; // Adjacent directement
-        }
-
-        // Vérifier si l'autre hexagone est adjacent à l'un des hexagones adjacents
-        for (Hex hex : adjacentHexes) {
-            List<Hex> secondAdjacentHexes = hex.rexAdjacent(plateau);
-            if (secondAdjacentHexes.contains(other)) {
-                return true; // Adjacent à 2 hexagones
-            }
-        }
-
-        return false; // Pas adjacent
     }
 }

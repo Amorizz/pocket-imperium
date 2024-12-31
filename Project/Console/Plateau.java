@@ -1,8 +1,6 @@
 package Project.Console;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Plateau {
 
@@ -107,5 +105,61 @@ public class Plateau {
             System.out.println("Conflit résolu dans l'hexagone " + hex + ". Le vainqueur est " + winner.getPlayerName());
         }
     }
+
+    public void calculateScore(List<Player> players) {
+        System.out.println("Calcul des scores pour le plateau...");
+
+        // Réinitialiser les scores de chaque joueur avant le calcul
+        for (Player player : players) {
+            player.resetPoints(); // Supposons que cette méthode remet les points du joueur à 0
+        }
+
+        for (String niveau : getPlateau().keySet()) {
+            List<SectorCard> sectors = getPlateau().get(niveau);
+
+            for (SectorCard sector : sectors) {
+                Map<Integer, Hex> hexes = sector.getHex();
+
+                for (Hex hex : hexes.values()) {
+                    // Identifier le joueur dominant sur cet hexagone
+                    Player dominantPlayer = null;
+                    int maxShips = 0;
+
+                    for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
+                        int ships = entry.getValue();
+
+                        if (ships > maxShips) {
+                            dominantPlayer = entry.getKey();
+                            maxShips = ships;
+                        } else if (ships == maxShips) {
+                            dominantPlayer = null; // Égalité, pas de joueur dominant
+                        }
+                    }
+
+                    if (dominantPlayer != null) {
+                        // 1 point pour contrôler un hexagone
+                        dominantPlayer.addPoints(1);
+
+                        // Bonus pour les hexagones stratégiques (niveau 3)
+                        if (hex.getLevel() == 3) {
+                            dominantPlayer.addPoints(2);
+                        }
+
+                        System.out.println(dominantPlayer.getPlayerName() + " gagne " +
+                                (hex.getLevel() == 3 ? "3" : "1") + " points");
+                    } else {
+                        System.out.println("Aucun joueur ne gagne de points ");
+                    }
+                }
+            }
+        }
+
+        // Afficher les scores finaux
+        System.out.println("\nScores finaux :");
+        for (Player player : players) {
+            System.out.println(player.getPlayerName() + " : " + player.getPoints() + " points.");
+        }
+    }
+
 
 }

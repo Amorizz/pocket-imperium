@@ -27,106 +27,60 @@ public class Game {
         players.add(player);
     }
 
-    public void start() {
-        if (players.size() > 0) {
-            state = "in progress";
-            List<Color> availableColors = Arrays.asList(Color.values()); // Récupérer toutes les couleurs de l'énum
-            for (int i = 0; i < players.size(); i++) {
-                Color couleurJoueur = availableColors.get(i % availableColors.size()); // Assigner une couleur unique
-                players.get(i).setColor(couleurJoueur); // Méthode à ajouter pour définir la couleur
-            }
-            createRounds(9); // Par exemple, créer rounds
-        } else {
-            System.out.println("Not enough players to start the game.");
+    public void start(ConsoleGUI console, Plateau plateau) {
+        if (players.isEmpty()) {
+            console.println("Not enough players to start the game.");
+            return;
+        }
+
+        state = "in progress";
+        assignPlayerColors();
+        initializeRounds(9, console, plateau);
+        rounds.get(0).placeFirstShips(plateau, console);
+        console.println("Le jeu peut maintenant commencer !");
+    }
+
+    private void assignPlayerColors() {
+        List<Color> availableColors = Arrays.asList(Color.values());
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setColor(availableColors.get(i % availableColors.size()));
         }
     }
 
-    private void createRounds(int numberOfRounds) {
+    private void initializeRounds(int numberOfRounds, ConsoleGUI console, Plateau plateau) {
         for (int i = 0; i < numberOfRounds; i++) {
-            rounds.add(new Round(i + 1, players));
+            rounds.add(new Round(i + 1, players, console, plateau));
         }
     }
 
-    private void startNextRound() {
-        if (currentRoundIndex < rounds.size()) {
+    public void play() {
+        while (currentRoundIndex < rounds.size()) {
             Round currentRound = rounds.get(currentRoundIndex);
-            currentRound.startRound(players.get(0)); // Par exemple, commencer avec le premier joueur
+            currentRound.start();
             currentRoundIndex++;
-        } else {
-            System.out.println("All rounds completed.");
-            state = "finished";
         }
-    }
 
-    public String getState() {
-        return state;
+        state = "finished";
+        System.out.println("Tous les rounds sont terminés. Le jeu est terminé.");
     }
 
     public List<Player> getPlayers() {
         return players;
     }
 
-    public List<String> getPlayerNames() {
-        List<String> playerNames = new ArrayList<>();
-        for (Player player : players) {
-            if (player != null) {
-                System.out.println(player.getPlayerName());
-                playerNames.add(player.getPlayerName());
-            }
-        }
-        return playerNames;
-    }
-
-    public List<List<Player>> sensplayer(Game game) {
-        List<List<Player>> orderPerRound = new ArrayList<>();
-
-        // Parcourir les 3 tours correspondant aux 3 cartes
-        for (int round = 0; round < 3; round++) {
-            List<Player> playersForRound = new ArrayList<>(game.getPlayers());
-
-            // Créer une map pour compter le nombre de joueurs ayant chaque commande
-            Map<Integer, Integer> commandCount = new HashMap<>();
-
-            // Compter les occurrences des commandes pour ce tour
-            for (Player player : playersForRound) {
-                int cardId = player.getCardsId().get(round);
-                commandCount.put(cardId, commandCount.getOrDefault(cardId, 0) + 1);
-            }
-
-            // Mettre à jour le power de chaque carte pour chaque joueur
-            for (Player player : playersForRound) {
-                int cardId = player.getCardsId().get(round);
-                CommandCard card = player.getCards().get(round); // Récupérer la carte
-                int power = Math.min(commandCount.get(cardId), 3); // Limiter le power à 3 maximum
-                card.setPower(power); // Mettre à jour le power de la carte
-            }
-
-            // Trier les joueurs selon la carte choisie pour le tour
-            int finalRound = round;
-            playersForRound.sort((player1, player2) -> {
-                int card1 = player1.getCardsId().get(finalRound);
-                int card2 = player2.getCardsId().get(finalRound);
-                return Integer.compare(card1, card2);
-            });
-
-            orderPerRound.add(playersForRound);
-        }
-
-        return orderPerRound;
-    }
-
     public void calculateScore(HashMap<String, ArrayList<SectorCard>> plateau, List<Player> players, ConsoleGUI console) {
         console.println("Calcul des scores...");
 
-        // Réinitialiser les scores avant chaque calcul
+        // Réinitialiser les scores des joueurs avant chaque calcul
         for (Player player : players) {
             player.resetPoints(); // Supposons que Player possède une méthode resetPoints()
         }
 
+        // Parcourir tous les hexagones du plateau
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
-                    // Trouver le joueur ayant le plus de ships sur cet hexagone
+                    // Identifier le joueur dominant sur cet hexagone
                     Player dominantPlayer = null;
                     int maxShips = 0;
 
@@ -135,42 +89,43 @@ public class Game {
                             dominantPlayer = entry.getKey();
                             maxShips = entry.getValue();
                         } else if (entry.getValue() == maxShips) {
-                            dominantPlayer = null; // Égalité, personne ne domine cet hexagone
+                            dominantPlayer = null; // Égalité, aucun joueur ne domine
                         }
                     }
 
                     if (dominantPlayer != null) {
-                        // Ajouter des points au joueur dominant
-                        dominantPlayer.addPoints(1); // 1 point par hexagone contrôlé
+                        // Ajouter 1 point par hexagone contrôlé
+                        dominantPlayer.addPoints(1);
 
-                        // Vérifier si c'est un hexagone stratégique (comme TriPrime)
-                        if (hex.getLevel() == 3) { // Exemple : TriPrime est de niveau 3
-                            dominantPlayer.addPoints(2); // Bonus de 2 points pour TriPrime
+                        // Vérifier si l'hexagone est stratégique (par exemple, TriPrime)
+                        if (hex.getLevel() == 3) { // Supposons que les hexagones stratégiques ont un niveau de 3
+                            dominantPlayer.addPoints(2); // Bonus de 2 points pour un hexagone stratégique
                         }
                     }
                 }
             }
         }
 
-        // Afficher les scores après le calcul
+        // Afficher les scores de tous les joueurs
+        console.println("Scores après calcul :");
         for (Player player : players) {
-            console.println(player.getPlayerName() + " a " + player.getPoints() + " points.");
+            console.println(player.getPlayerName() + " : " + player.getPoints() + " points.");
         }
     }
+
 
     public static void main(String[] args) {
         Game game = Game.getInstance();
         Plateau jeux = new Plateau();
         ConsoleGUI console = new ConsoleGUI(jeux);
+
         jeux.assignHexIds(); // Attribuer des identifiants uniques à chaque hexagone
 
         int nombreJoueurs = -1;
-
-        // Demander le nombre de joueurs réels
         while (nombreJoueurs < 0 || nombreJoueurs > 4) {
             console.println("Combien de joueurs réels vont jouer ? (0 à 4)");
             try {
-                String input = console.getInputSync(); // Utilisation de l'entrée synchronisée via GUI
+                String input = console.getInputSync();
                 nombreJoueurs = Integer.parseInt(input.trim());
                 if (nombreJoueurs < 0 || nombreJoueurs > 4) {
                     console.println("Erreur : Veuillez entrer un nombre compris entre 0 et 4.");
@@ -195,55 +150,7 @@ public class Game {
             game.addPlayer(new VirtualPlayer(nomJoueurVirtuel, 0));
         }
 
-        // Démarrer le jeu
-        game.start();
-        console.println("Le jeu peut maintenant commencer");
-        console.println("Nous avons bien " + game.getPlayers().size() + " joueurs");
-
-        // Afficher l'état et la liste des joueurs
-        console.println("État du jeu : " + game.getState());
-        console.println("Liste des joueurs et leurs couleurs :");
-        for (Player player : game.getPlayers()) {
-            console.println(player.getPlayerName() + " - Couleur : " + player.getColor());
-        }
-
-        // Placer le first ship de chaque joueur
-        for (Player player : game.getPlayers()) {
-            console.println("C'est à " + player.getPlayerName() + " de placer ses deux premiers bateaux :");
-            player.firstShip(jeux, console); // Passer ConsoleGUI pour afficher et recevoir les entrées
-            player.firstShip(jeux, console);
-        }
-
-        console.println("Le jeu peut maintenant commencer");
-
-        for (int i = 0; i < 9; i++) { // 9 rounds
-            console.println("Les joueurs doivent choisir leur carte :");
-            for (Player player : game.getPlayers()) {
-                console.println(player.getPlayerName() + " - Couleur : " + player.getColor());
-                player.chooseOrder(console); // Passer ConsoleGUI pour gérer les choix
-            }
-
-            List<List<Player>> SensPlayer = game.sensplayer(game); // Calcul de l'ordre des joueurs
-
-            for (int j = 0; j < SensPlayer.size(); j++) {
-                console.println("Ordre des joueurs pour le tour " + (j + 1) + " :");
-                for (Player player : SensPlayer.get(j)) {
-                    console.println("  - " + player.getPlayerName());
-                }
-            }
-
-            for (int j = 0; j < 3; j++) { // 3 cartes par joueur
-                for (Player player : SensPlayer.get(j)) {
-                    console.println("C'est à " + player.getPlayerName() + " de jouer :");
-                    console.println(player.getPlayerName() + " joue avec la carte numéro : " + player.getCardsId().get(j));
-                    player.Card(j, jeux, console); // Passer ConsoleGUI pour exécuter la carte
-                }
-                jeux.checkPlateau(console); // Vérifier les règles à la fin de chaque tour
-            }
-        }
-
-        game.startNextRound();
-        game.calculateScore(jeux.getPlateau(), game.getPlayers(), console); // Passer ConsoleGUI pour afficher les scores
+        game.start(console, jeux); // Lancer le jeu
+        game.play(); // Jouer tous les rounds
     }
-
 }
