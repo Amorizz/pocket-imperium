@@ -2,43 +2,59 @@ package Project.GUI;
 
 import java.util.*;
 
+/**
+ * La classe {@code CommandCard} représente une carte de commande utilisée par les joueurs dans le jeu.
+ * Chaque carte possède un ID, une puissance (power), et est associée à une des trois commandes principales :
+ * Expand, Explore, et Invade. Ces cartes permettent aux joueurs d'effectuer différentes actions stratégiques.
+ */
 public class CommandCard {
-    private int id;
-    private int power = 1;
+    private int id; // ID unique de la carte (1 : Expand, 2 : Explore, 3 : Invade)
+    private int power = 1; // Puissance de la carte (1, 2, ou 3)
     private final Random random = new Random(); // Générateur aléatoire partagé
 
+    /**
+     * Constructeur de la classe {@code CommandCard}.
+     *
+     * @param id l'identifiant unique de la carte (1 : Expand, 2 : Explore, 3 : Invade).
+     */
     public CommandCard(int id) {
         this.id = id;
     }
 
+    /**
+     * Retourne l'ID de la carte.
+     *
+     * @return l'identifiant unique de la carte.
+     */
     public int getId() {
         return this.id;
     }
 
+    /**
+     * Retourne le power de de la carte par rapport au nombre de joueur ayant retourné la meme carte dans le tour.
+     *
+     * @return l'identifiant unique de la carte.
+     */
     public int getPower() {
         return this.power;
     }
 
+    /**
+     * Définit la puissance de la carte en fonction du nombre de joueurs ayant choisi la même commande.
+     *
+     * @param power la nouvelle puissance de la carte (comprise entre 1 et 3).
+     */
     public void setPower(int power) {
         this.power = power;
     }
 
-    private void afficherPlateau(ConsoleGUI console) {
-        console.println(
-                "  [ 1] [ 2] #  [ 8] [ 9] #  [15] [16]\n" +
-                        "[ 3][ 4][ 5]#[10][11][12]#[17][18][19]\n" +
-                        "  [ 6] [ 7] #  [13] [14] #  [20] [21]\n" +
-                        "######################################\n" +
-                        "[22][23][24]#[30]   [31]#[35][36][37]\n" +
-                        "  [25] [26] #    [32]   #  [   38] [39]\n" +
-                        "[27][28][29]#[33]   [34]#[40][41][42]\n" +
-                        "######################################\n" +
-                        "  [43] [44] #  [50] [51] #  [57] [58]\n" +
-                        "[45][46][47]#[52][53][54]#[59][60][61]\n" +
-                        "  [48] [49] #  [55] [56] #  [62] [63]"
-        );
-    }
-
+    /**
+     * Retourne une liste de couleurs correspondant aux joueurs ayant des vaisseaux sur l'hexagone donné.
+     *
+     * @param hex     l'hexagone pour lequel récupérer les couleurs.
+     * @param console la console pour obtenir les couleurs des joueurs.
+     * @return une liste de couleurs correspondant aux joueurs ayant des vaisseaux sur l'hexagone.
+     */
     private List<java.awt.Color> getHexColors(Hex hex, ConsoleGUI console) {
         List<java.awt.Color> colors = new ArrayList<>();
         for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
@@ -51,7 +67,13 @@ public class CommandCard {
         return colors;
     }
 
-
+    /**
+     * Permet au joueur réel d'utiliser la commande Expand pour ajouter des vaisseaux sur les systèmes qu'il contrôle.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     * @param console la console pour afficher.
+     */
     public void expand(Player player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         int maxShipsToAdd = switch (this.power) {
             case 1 -> 3;
@@ -101,6 +123,13 @@ public class CommandCard {
         console.println("Extension terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Expand.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     * @param console la console pour afficher.
+     */
     public void vExpend(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         int maxShipsToAdd = switch (this.power) {
             case 1 -> 3;
@@ -146,6 +175,13 @@ public class CommandCard {
         console.println("Extension terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur réel d'utiliser la commande Explore pour déplacer des vaisseaux entre les hexagones.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones.
+     * @param console la console pour afficher.
+     */
     public void explore(Player player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         console.println(player.getPlayerName() + " va explorer !");
 
@@ -180,8 +216,23 @@ public class CommandCard {
 
             int departChoix = getValidInput(console, 1, playerHexes.size());
             Hex hexDepart = playerHexes.get(departChoix - 1);
-            List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
-            adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty());
+
+            List<Hex> adjHexes = hexDepart.rexAdjacent(plateau);
+            adjHexes.removeIf(hex -> !hex.getOccupation().isEmpty()); // Exclure les hexagones occupés par d'autres joueurs
+            Set<String> addedCoords = new HashSet<>();
+            List<Hex> adjacentHexes = new ArrayList<>();
+
+            for (Hex firstLevelHex : adjHexes) {
+                List<Hex> secondLevelAdjacents = firstLevelHex.rexAdjacent(plateau); // Niveau 2
+                for (Hex secondLevelHex : secondLevelAdjacents) {
+                    // Ajouter si non déjà ajouté et différent de l'hexagone d'origine
+                    String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
+                    if (!addedCoords.contains(coords) && !secondLevelHex.equals(hexDepart) && !secondLevelHex.getOccupation().containsKey(player)) {
+                        adjacentHexes.add(secondLevelHex);
+                        addedCoords.add(coords);
+                    }
+                }
+            }
 
             if (adjacentHexes.isEmpty()) {
                 console.println("Aucun hexagone adjacent valide pour explorer.");
@@ -213,6 +264,13 @@ public class CommandCard {
         }
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Explore.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones.
+     * @param console la console pour afficher.
+     */
     public void vExplore(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         console.println(player.getPlayerName() + " va explorer !");
         List<Hex> ownedHexes = player.getOwnedHexes(plateau);
@@ -236,6 +294,8 @@ public class CommandCard {
             // Sélectionner un hexagone de départ aléatoire
             Hex hexDepart = ownedHexes.get(random.nextInt(ownedHexes.size()));
 
+
+
             // Vérifier si le joueur a des bateaux sur cet hexagone
             Integer shipsAvailable = hexDepart.getOccupation().get(player);
             if (shipsAvailable == null || shipsAvailable <= 0) {
@@ -243,10 +303,23 @@ public class CommandCard {
                 continue;
             }
 
-            List<Hex> adjacentHexes = hexDepart.rexAdjacent(plateau);
+            // Identifier les hexagones adjacents
+            List<Hex> adjHexes = hexDepart.rexAdjacent(plateau);
+            adjHexes.removeIf(hex -> !hex.getOccupation().isEmpty()); // Exclure les hexagones occupés par d'autres joueurs
+            Set<String> addedCoords = new HashSet<>();
+            List<Hex> adjacentHexes = new ArrayList<>();
 
-            // Filtrer les hexagones adjacents non occupés
-            adjacentHexes.removeIf(hex -> !hex.getOccupation().isEmpty());
+            for (Hex firstLevelHex : adjHexes) {
+                List<Hex> secondLevelAdjacents = firstLevelHex.rexAdjacent(plateau); // Niveau 2
+                for (Hex secondLevelHex : secondLevelAdjacents) {
+                    // Ajouter si non déjà ajouté et différent de l'hexagone d'origine
+                    String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
+                    if (!addedCoords.contains(coords) && !secondLevelHex.equals(hexDepart) && !secondLevelHex.getOccupation().containsKey(player)) {
+                        adjacentHexes.add(secondLevelHex);
+                        addedCoords.add(coords);
+                    }
+                }
+            }
 
             if (adjacentHexes.isEmpty()) {
                 console.println("Aucun hexagone adjacent valide pour explorer à partir de " + hexDepart.getId() + ".");
@@ -272,6 +345,13 @@ public class CommandCard {
         }
     }
 
+    /**
+     * Permet au joueur réel d'utiliser la commande Invade pour envahir des systèmes adjacents.
+     *
+     * @param player  le joueur qui utilise la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     * @param console la console pour afficher.
+     */
     public void invade(Player player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         console.println(player.getPlayerName() + " prépare une invasion !");
 
@@ -282,19 +362,27 @@ public class CommandCard {
         };
 
         for (int i = 0; i < maxInvasions; i++) {
-            List<Hex> adjacentEnemyHexes = new ArrayList<>();
-
-            // Identifier les hexagones ennemis adjacents
+            List<Hex> playerHexes = new ArrayList<>();
             for (String niveau : plateau.keySet()) {
                 for (SectorCard sector : plateau.get(niveau)) {
                     for (Hex hex : sector.getHex().values()) {
                         if (hex.getOccupation().containsKey(player)) {
-                            // Ajouter les hexagones ennemis adjacents
-                            for (Hex adjacentHex : hex.rexAdjacent(plateau)) {
-                                if (adjacentHex.getOccupation().size() != 0 && !adjacentHex.getOccupation().containsKey(player)) {
-                                    adjacentEnemyHexes.add(adjacentHex);
-                                }
-                            }
+                            playerHexes.add(hex);
+                        }
+                    }
+                }
+            }
+
+            List<Hex> adjacentEnemyHexes = new ArrayList<>();
+            Set<String> addedCoords = new HashSet<>();
+            for (Hex hex : playerHexes) {
+                for (Hex hexAdj : hex.rexAdjacent(plateau)) {
+                    List<Hex> secondLevelAdjacents = hexAdj.rexAdjacent(plateau); // Niveau 2
+                    for (Hex secondLevelHex : secondLevelAdjacents) {
+                        String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
+                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().containsKey(player) && secondLevelHex.getOccupation().size() != 0) {
+                            adjacentEnemyHexes.add(secondLevelHex);
+                            addedCoords.add(coords);
                         }
                     }
                 }
@@ -324,38 +412,91 @@ public class CommandCard {
 
             Hex hexCible = adjacentEnemyHexes.get(choix - 1);
 
-            console.println("Combien de bateaux voulez-vous utiliser pour attaquer ? Max disponible : " + player.getShipNumber());
-            int shipsToUse = Math.min(Integer.parseInt(console.getInputSync().trim()), player.getShipNumber());
+            // Récupérer les hexagones adjacents contrôlés par le joueur
+            List<Hex> adjacentPlayerHexes = new ArrayList<>();
+            for (Hex adj : hexCible.rexAdjacent(plateau)) {
+                if (adj.getOccupation().containsKey(player)) {
+                    adjacentPlayerHexes.add(adj);
+                }
+            }
+
+            if (adjacentPlayerHexes.isEmpty()) {
+                console.println("Aucun hexagone adjacent pour fournir des vaisseaux.");
+                continue;
+            }
+
+            // Calculer le nombre total de vaisseaux disponibles
+            int totalShipsAvailable = 0;
+            for (Hex hex : adjacentPlayerHexes) {
+                totalShipsAvailable += hex.getOccupation().get(player);
+            }
+
+            console.println("Nombre total de vaisseaux disponibles pour l'attaque : " + totalShipsAvailable);
+            console.println("Combien de bateaux voulez-vous utiliser pour attaquer ? (max : " + totalShipsAvailable + ")");
+
+            int shipsToUse = 0;
+            while (shipsToUse < 1 || shipsToUse > totalShipsAvailable) {
+                try {
+                    shipsToUse = Integer.parseInt(console.getInputSync().trim());
+                } catch (NumberFormatException e) {
+                    console.println("Entrée invalide. Veuillez entrer un nombre.");
+                }
+            }
+
+            // Retirer les vaisseaux des hexagones adjacents, de manière aléatoire
+            int shipsRemaining = shipsToUse;
+            while (shipsRemaining > 0) {
+                Hex selectedHex = adjacentPlayerHexes.get(new Random().nextInt(adjacentPlayerHexes.size()));
+                int shipsInHex = selectedHex.getOccupation().get(player);
+                int shipsToRemove = Math.min(shipsRemaining, shipsInHex);
+
+                selectedHex.removeShip(player, shipsToRemove);
+                shipsRemaining -= shipsToRemove;
+                console.removeShipsFromHex(selectedHex.getId(), player.getColor());
+
+                console.println(player.getPlayerName() + " a retiré " + shipsToRemove + " vaisseau(x) de l'hexagone : " + selectedHex);
+
+                if (selectedHex.getOccupation().getOrDefault(player, 0) == 0) {
+                    adjacentPlayerHexes.remove(selectedHex); // Retirer l'hexagone s'il n'a plus de vaisseaux
+                }
+            }
+
+            // Résoudre le combat avec le défenseur
+            Player defender = hexCible.getOccupation().keySet().iterator().next();
+            int defenderShips = hexCible.getOccupation().get(defender);
+
+            int minShips = Math.min(shipsToUse, defenderShips);
+            shipsToUse -= minShips;
+            defenderShips -= minShips;
+
+            console.println("Combat : " + minShips + " vaisseau(x) détruit(s) de chaque côté.");
 
             if (shipsToUse > 0) {
-                // Résoudre le combat
-                Player defender = hexCible.getOccupation().keySet().iterator().next();
-                int defenderShips = hexCible.getOccupation().get(defender);
-
-                int minShips = Math.min(shipsToUse, defenderShips);
-                shipsToUse -= minShips;
-                defenderShips -= minShips;
-
-                // Mise à jour des hexagones
-                if (shipsToUse > 0) {
-                    hexCible.addShip(player, shipsToUse);
-                    console.placeShipInHex(hexCible.getId(), player.getColor());
-                }
-
-                if (defenderShips == 0) {
-                    hexCible.getOccupation().remove(defender);
-                } else {
-                    hexCible.getOccupation().put(defender, defenderShips);
-                    console.removeShipsFromHex(hexCible.getId(), defender.getColor());
-                }
-
-                console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
+                hexCible.addShip(player, shipsToUse);
+                console.placeShipInHex(hexCible.getId(), player.getColor());
             }
+
+            if (defenderShips == 0) {
+                hexCible.getOccupation().remove(defender);
+                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
+            } else {
+                hexCible.getOccupation().put(defender, defenderShips);
+                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
+            }
+
+            console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
         }
 
         console.println("Invasion terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet au joueur virtuel d'utiliser la commande Invade.
+     *
+     * @param player  le joueur virtuel utilisant la commande.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     * @param console la console pour afficher.
+     */
     public void vInvade(VirtualPlayer player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         console.println(player.getPlayerName() + " prépare une invasion !");
 
@@ -368,19 +509,27 @@ public class CommandCard {
         Random random = new Random();
 
         for (int i = 0; i < maxInvasions; i++) {
-            List<Hex> adjacentEnemyHexes = new ArrayList<>();
-
-            // Identifier les hexagones ennemis adjacents
+            List<Hex> playerHexes = new ArrayList<>();
             for (String niveau : plateau.keySet()) {
                 for (SectorCard sector : plateau.get(niveau)) {
                     for (Hex hex : sector.getHex().values()) {
                         if (hex.getOccupation().containsKey(player)) {
-                            // Ajouter les hexagones ennemis adjacents
-                            for (Hex adjacentHex : hex.rexAdjacent(plateau)) {
-                                if (adjacentHex.getOccupation().size() != 0 && !adjacentHex.getOccupation().containsKey(player)) {
-                                    adjacentEnemyHexes.add(adjacentHex);
-                                }
-                            }
+                            playerHexes.add(hex);
+                        }
+                    }
+                }
+            }
+
+            List<Hex> adjacentEnemyHexes = new ArrayList<>();
+            Set<String> addedCoords = new HashSet<>();
+            for (Hex hex : playerHexes) {
+                for (Hex hexAdj : hex.rexAdjacent(plateau)) {
+                    List<Hex> secondLevelAdjacents = hexAdj.rexAdjacent(plateau); // Niveau 2
+                    for (Hex secondLevelHex : secondLevelAdjacents) {
+                        String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
+                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().containsKey(player) && secondLevelHex.getOccupation().size() != 0) {
+                            adjacentEnemyHexes.add(secondLevelHex);
+                            addedCoords.add(coords);
                         }
                     }
                 }
@@ -392,37 +541,87 @@ public class CommandCard {
             }
 
             Hex hexCible = adjacentEnemyHexes.get(random.nextInt(adjacentEnemyHexes.size()));
-            int shipsToUse = Math.min(player.getShipNumber(), random.nextInt(5) + 1);
+            console.println(player.getPlayerName() + " a choisi l'hexagone cible ID: " + hexCible.getId());
+
+            // Récupérer les hexagones adjacents contrôlés par le joueur
+            List<Hex> adjacentPlayerHexes = new ArrayList<>();
+            for (Hex adj : hexCible.rexAdjacent(plateau)) {
+                if (adj.getOccupation().containsKey(player)) {
+                    adjacentPlayerHexes.add(adj);
+                }
+            }
+
+            if (adjacentPlayerHexes.isEmpty()) {
+                console.println("Aucun hexagone adjacent pour fournir des vaisseaux.");
+                continue;
+            }
+
+            // Calculer le nombre total de vaisseaux disponibles
+            int totalShipsAvailable = 0;
+            for (Hex hex : adjacentPlayerHexes) {
+                totalShipsAvailable += hex.getOccupation().get(player);
+            }
+
+            // Sélectionner un nombre de vaisseaux à utiliser, limité par les vaisseaux disponibles
+            int shipsToUse = random.nextInt(totalShipsAvailable) + 1;
+            console.println("Nombre total de vaisseaux disponibles : " + totalShipsAvailable);
+            console.println(player.getPlayerName() + " envoie " + shipsToUse + " vaisseau(x) pour l'invasion.");
+
+            // Retirer les vaisseaux des hexagones adjacents, de manière aléatoire
+            int shipsRemaining = shipsToUse;
+            while (shipsRemaining > 0) {
+                Hex selectedHex = adjacentPlayerHexes.get(random.nextInt(adjacentPlayerHexes.size()));
+                int shipsInHex = selectedHex.getOccupation().get(player);
+                int shipsToRemove = Math.min(shipsRemaining, shipsInHex);
+
+                selectedHex.removeShip(player, shipsToRemove);
+                shipsRemaining -= shipsToRemove;
+                console.removeShipsFromHex(selectedHex.getId(), player.getColor());
+
+                console.println(player.getPlayerName() + " a retiré " + shipsToRemove + " vaisseau(x) de l'hexagone : " + selectedHex);
+
+                if (selectedHex.getOccupation().getOrDefault(player, 0) == 0) {
+                    adjacentPlayerHexes.remove(selectedHex); // Retirer l'hexagone s'il n'a plus de vaisseaux
+                }
+            }
+
+            // Résoudre le combat avec le défenseur
+            Player defender = hexCible.getOccupation().keySet().iterator().next();
+            int defenderShips = hexCible.getOccupation().get(defender);
+
+            int minShips = Math.min(shipsToUse, defenderShips);
+            shipsToUse -= minShips;
+            defenderShips -= minShips;
+
+            console.println("Combat : " + minShips + " vaisseau(x) détruit(s) de chaque côté.");
 
             if (shipsToUse > 0) {
-                // Résoudre le combat
-                Player defender = hexCible.getOccupation().keySet().iterator().next();
-                int defenderShips = hexCible.getOccupation().get(defender);
-
-                int minShips = Math.min(shipsToUse, defenderShips);
-                shipsToUse -= minShips;
-                defenderShips -= minShips;
-
-                // Mise à jour des hexagones
-                if (shipsToUse > 0) {
-                    hexCible.addShip(player, shipsToUse);
-                    console.placeShipInHex(hexCible.getId(), player.getColor());
-                }
-
-                if (defenderShips == 0) {
-                    hexCible.getOccupation().remove(defender);
-                } else {
-                    hexCible.getOccupation().put(defender, defenderShips);
-                    console.removeShipsFromHex(hexCible.getId(), defender.getColor());
-                }
-
-                console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
+                hexCible.addShip(player, shipsToUse);
+                console.placeShipInHex(hexCible.getId(), player.getColor());
             }
+
+            if (defenderShips == 0) {
+                hexCible.getOccupation().remove(defender);
+                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
+            } else {
+                hexCible.getOccupation().put(defender, defenderShips);
+                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
+            }
+
+            console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
         }
 
         console.println("Invasion terminée pour " + player.getPlayerName() + ".");
     }
 
+    /**
+     * Permet de récupérer un entier valide de l'utilisateur.
+     *
+     * @param console la console pour afficher.
+     * @param min     la valeur minimale autorisée.
+     * @param max     la valeur maximale autorisée.
+     * @return l'entier valide entré par l'utilisateur.
+     */
     private int getValidInput(ConsoleGUI console, int min, int max) {
         int input = -1;
         while (input < min || input > max) {
@@ -439,7 +638,13 @@ public class CommandCard {
         return input;
     }
 
-
+    /**
+     * Exécute la carte de commande pour le joueur donné.
+     *
+     * @param player  le joueur qui utilise la carte.
+     * @param plateau le plateau contenant les hexagones et les systèmes.
+     * @param console la console pour afficher.
+     */
     public void executeCard(Player player, HashMap<String, ArrayList<SectorCard>> plateau, ConsoleGUI console) {
         System.out.println("Exécution de la carte " + id + " pour " + player.getPlayerName() + " avec le power " + power);
         if (player instanceof VirtualPlayer) {
