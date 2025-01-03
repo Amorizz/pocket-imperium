@@ -2,23 +2,45 @@ package Project.Console;
 
 import java.util.*;
 
+/**
+ * La classe {@code SectorCard} représente une carte secteur dans le jeu,
+ * contenant plusieurs hexagones avec des niveaux variés.
+ * Elle est responsable de la génération et de la gestion des hexagones d'un secteur.
+ */
 public class SectorCard {
-    private int number;
-    private int position = 0;
-    private boolean triPrime;
-    private boolean bottom;
-    private boolean top;
-    private String occupation;
-    private Map<Integer, Hex> Hexa;
+    private int number; // Numéro de la carte secteur
+    private int position = 0; // Position de la carte secteur
+    private boolean triPrime; // Indique si la carte secteur est un triPrime
+    private boolean bottom; // Indique si la carte secteur est un bottom
+    private boolean top; // Indique si la carte secteur est un top
+    private String occupation; // Occupation de la carte secteur
+    private Map<Integer, Hex> Hexa; // Hexagones de la carte secteur
 
+    /**
+     * Retourne l'occupation actuelle de la carte.
+     *
+     * @return une chaîne décrivant l'occupation actuelle.
+     */
     public String getOccupation() {
         return occupation;
     }
 
+    /**
+     * Définit l'occupation actuelle de la carte.
+     *
+     * @param occupation la chaîne représentant la nouvelle occupation.
+     */
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
 
+    /**
+     * Génère trois positions uniques pour des hexagones d'un secteur dans une liste ou le premier sera l'hexagone de niveau 2 et les deux autres seront les hexagones de niveau 1.
+     *
+     * @param nbr le nombre total d'hexagones dans le secteur.
+     * @return une liste de trois entiers uniques représentant les positions choisies.
+     * @throws IllegalArgumentException si le nombre d'hexagones est inférieur à 3.
+     */
     public ArrayList<Integer> position21(int nbr) {
         if (nbr < 3) {
             throw new IllegalArgumentException("Le nombre d'hexagones doit être au moins 3.");
@@ -37,6 +59,15 @@ public class SectorCard {
         return new ArrayList<>(uniquePositions);
     }
 
+    /**
+     * Constructeur de la classe {@code SectorCard}.
+     * Initialise les hexagones de la carte selon son type (TriPrime, bottom, top, ou standard).
+     *
+     * @param number   numéro de la carte secteur.
+     * @param triPrime indique si la carte est une carte TriPrime.
+     * @param bottom   indique si la carte est une carte "bottom".
+     * @param top      indique si la carte est une carte "top".
+     */
     public SectorCard(int number, boolean triPrime, boolean bottom, boolean top) {
         this.number = number;
         this.triPrime = triPrime;
@@ -103,14 +134,22 @@ public class SectorCard {
         }
     }
 
+    /**
+     * Retourne une représentation textuelle de la carte secteur.
+     *
+     * @return une chaîne indiquant le nombre d'hexagones dans la carte.
+     */
     public String toString(){
         return "Cette carte contient "+Hexa.size()+" Hexagone";
     }
 
-    public Hex getHexa(int nbr){
-        return Hexa.get(nbr);
-    }
-
+    /**
+     * Retourne un hexagone à partir de ses coordonnées.
+     *
+     * @param nx la coordonnée X.
+     * @param ny la coordonnée Y.
+     * @return l'hexagone correspondant ou {@code null} si aucun hexagone n'est trouvé.
+     */
     public Hex getHex(int nx, int ny) {
         for (Hex hex : Hexa.values()) {
             if (hex.getX() == nx && hex.getY() == ny) {
@@ -120,6 +159,11 @@ public class SectorCard {
         return null; // Aucun hexagone trouvé aux coordonnées données
     }
 
+    /**
+     * Retourne tous les hexagones associés à cette carte.
+     *
+     * @return une map contenant les hexagones avec leurs indices comme clés.
+     */
     public Map<Integer, Hex> getHex() {
         return this.Hexa;
     }

@@ -2,39 +2,60 @@ package Project.GUI;
 
 import java.util.*;
 
+/**
+ * La classe {@code Hex} représente une cellule hexagonale dans le jeu.
+ * Chaque hexagone possède des coordonnées, un niveau, une capacité maximale de vaisseaux
+ * et une carte des occupants (joueurs et nombre de vaisseaux qu'ils y possèdent).
+ */
 public class Hex {
-    private int x;
-    private int y;
-    private final int maxShipOn;
-    private final int level;
-    private Map<Player, Integer> occupation;
-    private int id;
+    private int x; // Coordonnée x de l'hexagone
+    private int y; // Coordonnée y de l'hexagone
+    private final int maxShipOn; // Capacité maximale de vaisseaux sur l'hexagone
+    private final int level; // Niveau de l'hexagone
+    private ArrayList<Ship> occupation; // Carte des occupants de l'hexagone
+    private int id; // Identifiant de l'hexagone
 
+    /**
+     * Consructeur pour initialiser un hexagone avec un niveau donné.
+     *      * La capacité maximale de vaisseaux est calculée en fonction du niveau.
+     *      *
+     *      * @tparam level le niveau de l'hexagone.
+     */
     public Hex(int level) {
         this.level = level;
         this.maxShipOn = level + 1;
-        this.occupation = new HashMap<>();
+        this.occupation = new ArrayList<>();
     }
 
+    /**
+     * Constructeur pour initialiser un hexagone avec un niveau donné.
+     * La capacité maximale de vaisseaux est calculée en fonction du niveau.
+     *
+     * @param id l'identifiant de l'hexagone.
+     */
     public void setId(int id) {
         this.id = id;
     }
 
-    public boolean hasAdjacentHexWithPlayer(Player player, HashMap<String, ArrayList<SectorCard>> plateau) {
-        for (Hex adjacent : this.rexAdjacent(plateau)) {
-            if (adjacent.getOccupation().containsKey(player)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
+    /**
+     * Definit l'identifiant de l'hexagone.
+     *
+     * @return l'identifiant.
+     */
     public int getId() {
         return id;
     }
 
-
+    /**
+     * Définit les coordonnées de l'hexagone en fonction de son emplacement
+     * et des règles spécifiques pour différentes régions du plateau.
+     *
+     * @param triPrime indique si l'hexagone appartient à la région TriPrime.
+     * @param bottom   indique si l'hexagone appartient à la région basse du plateau.
+     * @param top      indique si l'hexagone appartient à la région haute du plateau.
+     * @param place    la position de l'hexagone dans sa région.
+     * @param number   le numéro de la carte auquel appartient l'hexagone.
+     */
     public void reLoc(boolean triPrime, boolean bottom, boolean top, int place, int number) {
         if (triPrime) {
             System.out.println("C'est le TriPri");
@@ -86,68 +107,136 @@ public class Hex {
         System.out.println("Hex placé : x=" + this.x + ", y=" + this.y);
     }
 
+    /**
+     * Retourne la coordonnée X de l'hexagone.
+     *
+     * @return la coordonnée X.
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Retourne la coordonnée Y de l'hexagone.
+     *
+     * @return la coordonnée Y.
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Retourne une représentation textuelle de l'hexagone, incluant ses coordonnées,
+     * son niveau et les occupants (joueurs et leurs vaisseaux).
+     *
+     * @return une chaîne de caractères décrivant l'hexagone.
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder("X: " + this.x + " Y: " + this.y + " Level: " + this.level + " Occupants: ");
-        for (Map.Entry<Player, Integer> entry : occupation.entrySet()) {
-            sb.append(entry.getKey().getPlayerName()).append(": ").append(entry.getValue()).append(" ships, ");
+        for (Ship ship : occupation) {
+            sb.append(ship.getPlayerName().getPlayerName()).append(": ").append(ship.getNbrShipy()).append(" ships, ");
         }
         return sb.toString();
     }
 
-    public void addShip(Player player, int number) {
-        occupation.put(player, occupation.getOrDefault(player, 0) + number);
-    }
-
+    /**
+     * Supprime un certain nombre de vaisseaux pour un joueur spécifique dans cet hexagone.
+     * Si le nombre de vaisseaux devient nul ou négatif, le joueur est retiré de l'occupation.
+     *
+     * @param player le joueur auquel les vaisseaux appartiennent.
+     * @param number le nombre de vaisseaux à retirer.
+     */
     public void removeShip(Player player, int number) {
-        if (occupation.containsKey(player)) {
-            int remainingShips = occupation.get(player) - number;
-            if (remainingShips > 0) {
-                occupation.put(player, remainingShips);
-            } else {
-                occupation.remove(player);
+        List<Ship> toRemove = new ArrayList<>();
+        for (Ship ship : occupation) {
+            if (ship.getPlayerName().equals(player)) {
+                int remainingShips = ship.getNbrShipy() - number;
+                if (remainingShips > 0) {
+                    ship.setQuantity(remainingShips);
+                } else {
+                    toRemove.add(ship); // Ajouter à la liste des suppressions
+                }
+                break; // Quitter après modification
             }
         }
+        occupation.removeAll(toRemove); // Supprimer après l'itération
     }
 
-    public void clearOccupation(Player player) {
-        occupation.remove(player);
-    }
-
+    /**
+     * Supprime tous les occupants (joueurs et leurs vaisseaux) de cet hexagone.
+     */
     public void clearAllOccupation() {
         this.occupation.clear();
     }
 
-    // Getters et Setters
-    public int getShipon() {
-        return occupation.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-
+    /**
+     * Retourne la capacité maximale de vaisseaux pour cet hexagone.
+     *
+     * @return le nombre maximal de vaisseaux autorisé.
+     */
     public int getMaxshipon() {
         return maxShipOn;
     }
 
-    public Map<Player, Integer> getOccupation() {
+    /**
+     * Retourne la carte des occupants de l'hexagone.
+     * Chaque entrée correspond à un joueur et au nombre de vaisseaux qu'il possède.
+     *
+     * @return une carte des occupants.
+     */
+    public ArrayList<Ship> getOccupation() {
         return occupation;
     }
 
+    /**
+     * Retourne le nombre total de vaisseaux appartenant à un joueur spécifique
+     * dans cet hexagone.
+     *
+     * @param player Le joueur dont on veut connaître le nombre de vaisseaux.
+     * @return Le nombre de vaisseaux appartenant au joueur.
+     */
+    public int getShipCountForPlayer(Player player) {
+        for (Ship ship : occupation) {
+            if (ship.getPlayerName().equals(player)) {
+                return ship.getNbrShipy();
+            }
+        }
+        return 0;
+    }
 
+    /**
+     * Retourne le niveau de cet hexagone.
+     *
+     * @return le niveau.
+     */
     public int getLevel() {
         return level;
     }
 
-    public void addShipsPlayer(Player player, int count) {
-        this.occupation.put(player, count);
+    /**
+     * Ajoute un nombre spécifique de vaisseaux pour un joueur donné.
+     * Cette méthode peut remplacer la valeur existante si le joueur est déjà présent.
+     *
+     * @param player le joueur auquel les vaisseaux appartiennent.
+     * @param count  le nombre de vaisseaux à ajouter.
+     */
+    public void addShip(Player player, int count) {
+        for (Ship ship : occupation) {
+            if (ship.getPlayerName().equals(player)) {
+                ship.addQuantity(count);
+                return;
+            }
+        }
+        occupation.add(new Ship(player, count));
     }
 
+    /**
+     * Retourne une liste des hexagones adjacents à cet hexagone en fonction de sa position
+     * et des règles spécifiques du jeu.
+     *
+     * @param plateau le plateau contenant tous les secteurs et hexagones.
+     * @return une liste des hexagones adjacents.
+     */
     public List<Hex> rexAdjacent(HashMap<String, ArrayList<SectorCard>> plateau) {
         List<Hex> adjacents = new ArrayList<>();
         Set<String> addedCoords = new HashSet<>();
@@ -218,23 +307,5 @@ public class Hex {
         }
 
         return adjacents;
-    }
-
-
-    public boolean isAdjacent(Hex other, HashMap<String, ArrayList<SectorCard>> plateau) {
-        List<Hex> adjacentHexes = this.rexAdjacent(plateau); // Obtenir les hexagones adjacents
-        if (adjacentHexes.contains(other)) {
-            return true; // Adjacent directement
-        }
-
-        // Vérifier si l'autre hexagone est adjacent à l'un des hexagones adjacents
-        for (Hex hex : adjacentHexes) {
-            List<Hex> secondAdjacentHexes = hex.rexAdjacent(plateau);
-            if (secondAdjacentHexes.contains(other)) {
-                return true; // Adjacent à 2 hexagones
-            }
-        }
-
-        return false; // Pas adjacent
     }
 }

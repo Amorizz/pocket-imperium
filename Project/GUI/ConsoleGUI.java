@@ -6,6 +6,11 @@ import java.util.*;
 import java.util.List;
 import java.awt.Color;
 
+/**
+ * La classe ConsoleGUI représente l'interface graphique pour le jeu Pocket Imperium.
+ * Elle permet d'afficher les informations du jeu, de gérer les entrées utilisateur,
+ * et de visualiser les hexagones ainsi que les déplacements des vaisseaux.
+ */
 public class ConsoleGUI extends JFrame {
     private JTextArea textArea;
     private JTextField inputField;
@@ -15,6 +20,11 @@ public class ConsoleGUI extends JFrame {
     private final HashMap<Integer, Polygon> hexagonMap = new HashMap<>();
     private final HashMap<Integer, List<Color>> hexShips = new HashMap<>();
 
+    /**
+     * Constructeur de la classe ConsoleGUI.
+     *
+     * @param plateau Le plateau du jeu contenant les hexagones.
+     */
     public ConsoleGUI(Plateau plateau) {
         setTitle("Pocket Imperium");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,11 +56,23 @@ public class ConsoleGUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Met à jour la liste des couleurs des vaisseaux associés à un hexagone donné.
+     *
+     * @param hexId  L'identifiant unique de l'hexagone.
+     * @param colors La liste des couleurs des vaisseaux à afficher sur cet hexagone.
+     */
     public void updateHexShips(int hexId, List<Color> colors) {
         hexShips.put(hexId, colors); // Mettre à jour les bateaux sur l'hexagone
         repaint(); // Redessiner le plateau
     }
 
+    /**
+     * Convertit un nom de couleur en objet Color Java.
+     *
+     * @param colorName Le nom de la couleur (exemple : "rouge").
+     * @return L'objet Color correspondant.
+     */
     public java.awt.Color getColorFromName(String colorName) {
         return switch (colorName.toLowerCase()) {
             case "rouge" -> Color.RED;
@@ -61,6 +83,11 @@ public class ConsoleGUI extends JFrame {
         };
     }
 
+    /**
+     * Crée et configure le panneau de visualisation du plateau de jeu.
+     *
+     * @return Un JPanel contenant le plateau de jeu dessiné.
+     */
     private JPanel createGameBoardPanel() {
         JPanel gameBoardPanel = new JPanel() {
             @Override
@@ -270,6 +297,12 @@ public class ConsoleGUI extends JFrame {
         return gameBoardPanel;
     }
 
+    /**
+     * Place un vaisseau dans un hexagone et redessine le plateau.
+     *
+     * @param hexId     L'identifiant unique de l'hexagone.
+     * @param colorName Le nom de la couleur du vaisseau à ajouter.
+     */
     public void placeShipInHex(int hexId, String colorName) {
         Color color;
         switch (colorName.toLowerCase()) {
@@ -294,6 +327,12 @@ public class ConsoleGUI extends JFrame {
         repaint();
     }
 
+    /**
+     * Supprime tous les vaisseaux d'une couleur donnée d'un hexagone.
+     *
+     * @param hexId     L'identifiant unique de l'hexagone.
+     * @param colorName Le nom de la couleur des vaisseaux à supprimer.
+     */
     public void removeShipsFromHex(int hexId, String colorName) {
         // Convertir le nom de la couleur en objet Color
         Color color;
@@ -328,10 +367,20 @@ public class ConsoleGUI extends JFrame {
         repaint(); // Redessiner le plateau
     }
 
+    /**
+     * Affiche un message dans la console de l'interface graphique.
+     *
+     * @param text Le texte à afficher.
+     */
     public void println(String text) {
         textArea.append(text + "\n");
     }
 
+    /**
+     * Récupère une entrée utilisateur de manière synchrone.
+     *
+     * @return La chaîne de texte saisie par l'utilisateur.
+     */
     public String getInputSync() {
         final Object lock = new Object();
         final String[] input = new String[1];

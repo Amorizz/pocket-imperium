@@ -57,12 +57,8 @@ public class CommandCard {
      */
     private List<java.awt.Color> getHexColors(Hex hex, ConsoleGUI console) {
         List<java.awt.Color> colors = new ArrayList<>();
-        for (Map.Entry<Player, Integer> entry : hex.getOccupation().entrySet()) {
-            Player player = entry.getKey();
-            int ships = entry.getValue();
-            for (int i = 0; i < ships; i++) {
-                colors.add(console.getColorFromName(player.getColor()));
-            }
+        for (Ship ship : hex.getOccupation()) {
+            colors.add(console.getColorFromName(ship.getPlayerName().getColor()));
         }
         return colors;
     }
@@ -92,8 +88,10 @@ public class CommandCard {
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
-                    if (hex.getOccupation().containsKey(player)) {
-                        controlledHexes.add(hex);
+                    for (Ship ship : hex.getOccupation()) {
+                        if (ship.getPlayerName().equals(player)) {
+                            controlledHexes.add(hex);
+                        }
                     }
                 }
             }
@@ -148,8 +146,10 @@ public class CommandCard {
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
-                    if (hex.getOccupation().containsKey(player)) {
-                        controlledHexes.add(hex);
+                    for (Ship ship : hex.getOccupation()) {
+                        if (ship.getPlayerName().equals(player)) {
+                            controlledHexes.add(hex);
+                        }
                     }
                 }
             }
@@ -196,8 +196,10 @@ public class CommandCard {
             for (String niveau : plateau.keySet()) {
                 for (SectorCard sector : plateau.get(niveau)) {
                     for (Hex hex : sector.getHex().values()) {
-                        if (hex.getOccupation().containsKey(player)) {
-                            playerHexes.add(hex);
+                        for (Ship ship : hex.getOccupation()) {
+                            if (ship.getPlayerName().equals(player)) {
+                                playerHexes.add(hex);
+                            }
                         }
                     }
                 }
@@ -217,22 +219,26 @@ public class CommandCard {
             int departChoix = getValidInput(console, 1, playerHexes.size());
             Hex hexDepart = playerHexes.get(departChoix - 1);
 
-            List<Hex> adjHexes = hexDepart.rexAdjacent(plateau);
-            adjHexes.removeIf(hex -> !hex.getOccupation().isEmpty()); // Exclure les hexagones occupés par d'autres joueurs
+            List<Hex> adjHexes = hexDepart.rexAdjacent(plateau);// Exclure les hexagones occupés par d'autres joueurs
+            adjHexes.removeIf(hex -> hex.getOccupation().size() != 0);
+
             Set<String> addedCoords = new HashSet<>();
             List<Hex> adjacentHexes = new ArrayList<>();
 
             for (Hex firstLevelHex : adjHexes) {
                 List<Hex> secondLevelAdjacents = firstLevelHex.rexAdjacent(plateau); // Niveau 2
                 for (Hex secondLevelHex : secondLevelAdjacents) {
-                    // Ajouter si non déjà ajouté et différent de l'hexagone d'origine
+                    // Ajouter si non déjà ajouté, non occupé et différent de l'hexagone d'origine
                     String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
-                    if (!addedCoords.contains(coords) && !secondLevelHex.equals(hexDepart) && !secondLevelHex.getOccupation().containsKey(player)) {
+                    if (!addedCoords.contains(coords)
+                            && secondLevelHex.getOccupation().size() == 0 // Hex vide
+                            && !secondLevelHex.equals(hexDepart)) { // Pas le même que hexDepart
                         adjacentHexes.add(secondLevelHex);
                         addedCoords.add(coords);
                     }
                 }
             }
+
 
             if (adjacentHexes.isEmpty()) {
                 console.println("Aucun hexagone adjacent valide pour explorer.");
@@ -248,7 +254,7 @@ public class CommandCard {
             Hex hexCible = adjacentHexes.get(cibleChoix - 1);
 
             // Nombre de bateaux à déplacer
-            int shipsToMove = hexDepart.getOccupation().get(player);
+            int shipsToMove = hexDepart.getShipCountForPlayer(player);
 
             // Mise à jour des hexagones dans les données du jeu
             hexDepart.removeShip(player, shipsToMove);
@@ -297,7 +303,7 @@ public class CommandCard {
 
 
             // Vérifier si le joueur a des bateaux sur cet hexagone
-            Integer shipsAvailable = hexDepart.getOccupation().get(player);
+            Integer shipsAvailable = hexDepart.getShipCountForPlayer(player);
             if (shipsAvailable == null || shipsAvailable <= 0) {
                 ownedHexes.remove(hexDepart); // Retirer les hexagones sans bateaux de la liste
                 continue;
@@ -305,16 +311,18 @@ public class CommandCard {
 
             // Identifier les hexagones adjacents
             List<Hex> adjHexes = hexDepart.rexAdjacent(plateau);
-            adjHexes.removeIf(hex -> !hex.getOccupation().isEmpty()); // Exclure les hexagones occupés par d'autres joueurs
+            adjHexes.removeIf(hex -> hex.getOccupation().size() != 0); // Exclure les hexagones occupés par d'autres joueurs
             Set<String> addedCoords = new HashSet<>();
             List<Hex> adjacentHexes = new ArrayList<>();
 
             for (Hex firstLevelHex : adjHexes) {
                 List<Hex> secondLevelAdjacents = firstLevelHex.rexAdjacent(plateau); // Niveau 2
                 for (Hex secondLevelHex : secondLevelAdjacents) {
-                    // Ajouter si non déjà ajouté et différent de l'hexagone d'origine
+                    // Ajouter si non déjà ajouté, non occupé et différent de l'hexagone d'origine
                     String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
-                    if (!addedCoords.contains(coords) && !secondLevelHex.equals(hexDepart) && !secondLevelHex.getOccupation().containsKey(player)) {
+                    if (!addedCoords.contains(coords)
+                            && secondLevelHex.getOccupation().size() == 0 // Hex vide
+                            && !secondLevelHex.equals(hexDepart)) { // Pas le même que hexDepart
                         adjacentHexes.add(secondLevelHex);
                         addedCoords.add(coords);
                     }
@@ -366,8 +374,10 @@ public class CommandCard {
             for (String niveau : plateau.keySet()) {
                 for (SectorCard sector : plateau.get(niveau)) {
                     for (Hex hex : sector.getHex().values()) {
-                        if (hex.getOccupation().containsKey(player)) {
-                            playerHexes.add(hex);
+                        for (Ship ship : hex.getOccupation()) {
+                            if (ship.getPlayerName().equals(player)) {
+                                playerHexes.add(hex);
+                            }
                         }
                     }
                 }
@@ -380,7 +390,7 @@ public class CommandCard {
                     List<Hex> secondLevelAdjacents = hexAdj.rexAdjacent(plateau); // Niveau 2
                     for (Hex secondLevelHex : secondLevelAdjacents) {
                         String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
-                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().containsKey(player) && secondLevelHex.getOccupation().size() != 0) {
+                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().contains(player) && secondLevelHex.getOccupation().size() != 0) {
                             adjacentEnemyHexes.add(secondLevelHex);
                             addedCoords.add(coords);
                         }
@@ -415,10 +425,14 @@ public class CommandCard {
             // Récupérer les hexagones adjacents contrôlés par le joueur
             List<Hex> adjacentPlayerHexes = new ArrayList<>();
             for (Hex adj : hexCible.rexAdjacent(plateau)) {
-                if (adj.getOccupation().containsKey(player)) {
-                    adjacentPlayerHexes.add(adj);
+                // Vérifier si un des Ship dans l'occupation de cet hexagone appartient au joueur
+                for (Ship ship : adj.getOccupation()) {
+                    if (ship.getPlayerName().equals(player)) {
+                        adjacentPlayerHexes.add(adj);
+                    }
                 }
             }
+
 
             if (adjacentPlayerHexes.isEmpty()) {
                 console.println("Aucun hexagone adjacent pour fournir des vaisseaux.");
@@ -428,7 +442,7 @@ public class CommandCard {
             // Calculer le nombre total de vaisseaux disponibles
             int totalShipsAvailable = 0;
             for (Hex hex : adjacentPlayerHexes) {
-                totalShipsAvailable += hex.getOccupation().get(player);
+                totalShipsAvailable += hex.getShipCountForPlayer(player);
             }
 
             console.println("Nombre total de vaisseaux disponibles pour l'attaque : " + totalShipsAvailable);
@@ -443,48 +457,42 @@ public class CommandCard {
                 }
             }
 
-            // Retirer les vaisseaux des hexagones adjacents, de manière aléatoire
+            // Retirer les vaisseaux des hexagones adjacents
             int shipsRemaining = shipsToUse;
-            while (shipsRemaining > 0) {
-                Hex selectedHex = adjacentPlayerHexes.get(new Random().nextInt(adjacentPlayerHexes.size()));
-                int shipsInHex = selectedHex.getOccupation().get(player);
+            Iterator<Hex> iterator = adjacentPlayerHexes.iterator();
+            while (shipsRemaining > 0 && iterator.hasNext()) {
+                Hex hex = iterator.next();
+                int shipsInHex = hex.getShipCountForPlayer(player);
                 int shipsToRemove = Math.min(shipsRemaining, shipsInHex);
 
-                selectedHex.removeShip(player, shipsToRemove);
+                hex.removeShip(player, shipsToRemove);
                 shipsRemaining -= shipsToRemove;
-                console.removeShipsFromHex(selectedHex.getId(), player.getColor());
 
-                console.println(player.getPlayerName() + " a retiré " + shipsToRemove + " vaisseau(x) de l'hexagone : " + selectedHex);
+                console.removeShipsFromHex(hex.getId(), player.getColor());
+            }
 
-                if (selectedHex.getOccupation().getOrDefault(player, 0) == 0) {
-                    adjacentPlayerHexes.remove(selectedHex); // Retirer l'hexagone s'il n'a plus de vaisseaux
+            // Combat avec le défenseur
+            int sommedef = 0;
+            for (Ship ship : hexCible.getOccupation()){
+                sommedef += ship.getNbrShipy();
+            }
+            
+            if (sommedef < shipsToUse){
+                shipsToUse = shipsToUse - sommedef;
+                hexCible.clearAllOccupation();
+                hexCible.addShip(player,shipsToUse);
+            } else if (sommedef > shipsToUse) {
+                while (shipsToUse != 0){
+                    for (Ship ship : hexCible.getOccupation()){
+                        if (shipsToUse == 0){
+                            break;
+                        }
+                        hexCible.removeShip(ship.getPlayerName(),1);
+                        shipsToUse -= 1;
+                    }
                 }
             }
 
-            // Résoudre le combat avec le défenseur
-            Player defender = hexCible.getOccupation().keySet().iterator().next();
-            int defenderShips = hexCible.getOccupation().get(defender);
-
-            int minShips = Math.min(shipsToUse, defenderShips);
-            shipsToUse -= minShips;
-            defenderShips -= minShips;
-
-            console.println("Combat : " + minShips + " vaisseau(x) détruit(s) de chaque côté.");
-
-            if (shipsToUse > 0) {
-                hexCible.addShip(player, shipsToUse);
-                console.placeShipInHex(hexCible.getId(), player.getColor());
-            }
-
-            if (defenderShips == 0) {
-                hexCible.getOccupation().remove(defender);
-                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
-            } else {
-                hexCible.getOccupation().put(defender, defenderShips);
-                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
-            }
-
-            console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
         }
 
         console.println("Invasion terminée pour " + player.getPlayerName() + ".");
@@ -513,8 +521,10 @@ public class CommandCard {
             for (String niveau : plateau.keySet()) {
                 for (SectorCard sector : plateau.get(niveau)) {
                     for (Hex hex : sector.getHex().values()) {
-                        if (hex.getOccupation().containsKey(player)) {
-                            playerHexes.add(hex);
+                        for (Ship ship : hex.getOccupation()) {
+                            if (ship.getPlayerName().equals(player)) {
+                                playerHexes.add(hex);
+                            }
                         }
                     }
                 }
@@ -527,7 +537,7 @@ public class CommandCard {
                     List<Hex> secondLevelAdjacents = hexAdj.rexAdjacent(plateau); // Niveau 2
                     for (Hex secondLevelHex : secondLevelAdjacents) {
                         String coords = secondLevelHex.getX() + "," + secondLevelHex.getY();
-                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().containsKey(player) && secondLevelHex.getOccupation().size() != 0) {
+                        if (!addedCoords.contains(coords) && !secondLevelHex.equals(hex) && !secondLevelHex.getOccupation().contains(player) && secondLevelHex.getOccupation().size() != 0) {
                             adjacentEnemyHexes.add(secondLevelHex);
                             addedCoords.add(coords);
                         }
@@ -546,8 +556,10 @@ public class CommandCard {
             // Récupérer les hexagones adjacents contrôlés par le joueur
             List<Hex> adjacentPlayerHexes = new ArrayList<>();
             for (Hex adj : hexCible.rexAdjacent(plateau)) {
-                if (adj.getOccupation().containsKey(player)) {
-                    adjacentPlayerHexes.add(adj);
+                for (Ship ship : adj.getOccupation()) {
+                    if (ship.getPlayerName().equals(player)) {
+                        adjacentPlayerHexes.add(adj);
+                    }
                 }
             }
 
@@ -559,7 +571,7 @@ public class CommandCard {
             // Calculer le nombre total de vaisseaux disponibles
             int totalShipsAvailable = 0;
             for (Hex hex : adjacentPlayerHexes) {
-                totalShipsAvailable += hex.getOccupation().get(player);
+                totalShipsAvailable += hex.getShipCountForPlayer(player);
             }
 
             // Sélectionner un nombre de vaisseaux à utiliser, limité par les vaisseaux disponibles
@@ -571,7 +583,7 @@ public class CommandCard {
             int shipsRemaining = shipsToUse;
             while (shipsRemaining > 0) {
                 Hex selectedHex = adjacentPlayerHexes.get(random.nextInt(adjacentPlayerHexes.size()));
-                int shipsInHex = selectedHex.getOccupation().get(player);
+                int shipsInHex = selectedHex.getShipCountForPlayer(player);
                 int shipsToRemove = Math.min(shipsRemaining, shipsInHex);
 
                 selectedHex.removeShip(player, shipsToRemove);
@@ -580,35 +592,34 @@ public class CommandCard {
 
                 console.println(player.getPlayerName() + " a retiré " + shipsToRemove + " vaisseau(x) de l'hexagone : " + selectedHex);
 
-                if (selectedHex.getOccupation().getOrDefault(player, 0) == 0) {
-                    adjacentPlayerHexes.remove(selectedHex); // Retirer l'hexagone s'il n'a plus de vaisseaux
+                if (selectedHex.getShipCountForPlayer(player) == 0) {
+                    adjacentPlayerHexes.remove(selectedHex); // Supprimer l'hexagone si plus de vaisseaux
                 }
+
             }
 
             // Résoudre le combat avec le défenseur
-            Player defender = hexCible.getOccupation().keySet().iterator().next();
-            int defenderShips = hexCible.getOccupation().get(defender);
-
-            int minShips = Math.min(shipsToUse, defenderShips);
-            shipsToUse -= minShips;
-            defenderShips -= minShips;
-
-            console.println("Combat : " + minShips + " vaisseau(x) détruit(s) de chaque côté.");
-
-            if (shipsToUse > 0) {
-                hexCible.addShip(player, shipsToUse);
-                console.placeShipInHex(hexCible.getId(), player.getColor());
+            // Combat avec le défenseur
+            int sommedef = 0;
+            for (Ship ship : hexCible.getOccupation()){
+                sommedef += ship.getNbrShipy();
             }
 
-            if (defenderShips == 0) {
-                hexCible.getOccupation().remove(defender);
-                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
-            } else {
-                hexCible.getOccupation().put(defender, defenderShips);
-                console.removeShipsFromHex(hexCible.getId(), defender.getColor());
+            if (sommedef < shipsToUse){
+                shipsToUse = shipsToUse - sommedef;
+                hexCible.clearAllOccupation();
+                hexCible.addShip(player,shipsToUse);
+            } else if (sommedef > shipsToUse) {
+                while (shipsToUse != 0){
+                    for (Ship ship : hexCible.getOccupation()){
+                        if (shipsToUse == 0){
+                            break;
+                        }
+                        hexCible.removeShip(ship.getPlayerName(),1);
+                        shipsToUse -= 1;
+                    }
+                }
             }
-
-            console.println(player.getPlayerName() + " a envahi l'hexagone ID: " + hexCible.getId());
         }
 
         console.println("Invasion terminée pour " + player.getPlayerName() + ".");

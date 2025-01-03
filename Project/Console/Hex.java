@@ -8,11 +8,11 @@ import java.util.*;
  * et une carte des occupants (joueurs et nombre de vaisseaux qu'ils y possèdent).
  */
 public class Hex {
-    private int x;
-    private int y;
-    private final int maxShipOn;
-    private final int level;
-    private Map<Player, Integer> occupation;
+    private int x; // Coordonnée X de l'hexagone
+    private int y; // Coordonnée Y de l'hexagone
+    private final int maxShipOn; // Capacité maximale de vaisseaux
+    private final int level; // Niveau de l'hexagone
+    private ArrayList<Ship> occupation; // Carte des occupants
 
     /**
      * Constructeur pour initialiser un hexagone avec un niveau donné.
@@ -23,7 +23,8 @@ public class Hex {
     public Hex(int level) {
         this.level = level;
         this.maxShipOn = level + 1;
-        this.occupation = new HashMap<>();
+        this.occupation = new ArrayList<>() {
+        };
     }
 
     /**
@@ -113,10 +114,23 @@ public class Hex {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("X: " + this.x + " Y: " + this.y + " Level: " + this.level + " Occupants: ");
-        for (Map.Entry<Player, Integer> entry : occupation.entrySet()) {
-            sb.append(entry.getKey().getPlayerName()).append(": ").append(entry.getValue()).append(" ships, ");
+        for (Ship entry : occupation) {
+            sb.append(entry.getPlayerName()).append(": ").append(entry.getNbrShipy()).append(" ships, ");
         }
         return sb.toString();
+    }
+
+    /**
+     * Retourne le nombre total de vaisseaux appartenant à un joueur spécifique
+     * dans cet hexagone.
+     *
+     * @param player Le joueur dont on veut connaître le nombre de vaisseaux.
+     * @return Le nombre de vaisseaux appartenant au joueur.
+     */
+    public int getShipCountForPlayer(Player player) {
+        return (int) occupation.stream()
+                .filter(ship -> ship.getPlayerName().equals(player))
+                .count();
     }
 
     /**
@@ -126,7 +140,7 @@ public class Hex {
      * @param number le nombre de vaisseaux à ajouter.
      */
     public void addShip(Player player, int number) {
-        occupation.put(player, occupation.getOrDefault(player, 0) + number);
+        occupation.add(new Ship(player, number));
     }
 
     /**
@@ -137,12 +151,14 @@ public class Hex {
      * @param number le nombre de vaisseaux à retirer.
      */
     public void removeShip(Player player, int number) {
-        if (occupation.containsKey(player)) {
-            int remainingShips = occupation.get(player) - number;
-            if (remainingShips > 0) {
-                occupation.put(player, remainingShips);
-            } else {
-                occupation.remove(player);
+        for (Ship ship : occupation) {
+            if (ship.getPlayerName().equals(player)) {
+                int remainingShips = ship.getNbrShipy() - number;
+                if (remainingShips > 0) {
+                    ship.setQuantity(remainingShips);
+                } else {
+                    occupation.remove(ship);
+                }
             }
         }
     }
@@ -169,7 +185,7 @@ public class Hex {
      *
      * @return une carte des occupants.
      */
-    public Map<Player, Integer> getOccupation() {
+    public ArrayList<Ship> getOccupation() {
         return occupation;
     }
 
@@ -190,7 +206,13 @@ public class Hex {
      * @param count  le nombre de vaisseaux à ajouter.
      */
     public void addShipsPlayer(Player player, int count) {
-        this.occupation.put(player, count);
+        for (Ship ship : occupation) {
+            if (ship.getPlayerName().equals(player)) {
+                ship.addQuantity(count);
+                return;
+            }
+        }
+        occupation.add(new Ship(player, count));
     }
 
     /**

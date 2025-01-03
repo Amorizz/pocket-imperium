@@ -2,17 +2,35 @@ package Project.Console;
 
 import java.util.*;
 
+/**
+ * La classe {@code Round} représente un tour de jeu dans le cadre d'une partie.
+ * Elle gère les actions des joueurs, le placement initial des bateaux, et le calcul des scores
+ * à la fin du round.
+ */
 public class Round {
-    private int roundNumber;
-    private List<Player> players;
-    private Plateau plateau;
+    private int roundNumber; // Le numéro du round
+    private List<Player> players; // La liste des joueurs participant au round
+    private Plateau plateau; // Le plateau de jeu utilisé durant le round
 
+    /**
+     * Constructeur de la classe {@code Round}.
+     *
+     * @param roundNumber le numéro du round.
+     * @param players     la liste des joueurs participant au round.
+     * @param plateau     le plateau de jeu utilisé durant le round.
+     */
     public Round(int roundNumber, List<Player> players, Plateau plateau) {
         this.roundNumber = roundNumber;
         this.players = players;
         this.plateau = plateau;
     }
 
+    /**
+     * Démarre le round en suivant les étapes :
+     * - Placement initial des bateaux.
+     * - Exécution des actions des joueurs.
+     * - Vérification des règles sur le plateau.
+     */
     public void startRound() {
         System.out.println("Round " + roundNumber + " started.");
         placeFirstShips();
@@ -21,6 +39,9 @@ public class Round {
         System.out.println("Round " + roundNumber + " completed.");
     }
 
+    /**
+     * Permet à chaque joueur de placer leurs deux premiers bateaux sur le plateau.
+     */
     private void placeFirstShips() {
         for (Player player : players) {
             System.out.println("C'est à " + player.getPlayerName() + " de placer ses deux premiers bateaux.");
@@ -29,6 +50,11 @@ public class Round {
         }
     }
 
+    /**
+     * Gère les actions des joueurs durant le round :
+     * - Les joueurs choisissent leurs cartes.
+     * - Les actions des joueurs sont exécutées dans l'ordre défini par leurs cartes.
+     */
     private void executePlayerActions() {
         System.out.println("Les joueurs doivent choisir leurs cartes.");
         for (Player player : players) {
@@ -46,6 +72,11 @@ public class Round {
         }
     }
 
+    /**
+     * Détermine l'ordre des joueurs pour chaque tour d'action en fonction de leurs cartes choisies.
+     *
+     * @return une liste de listes représentant l'ordre des joueurs pour chaque tour.
+     */
     private List<List<Player>> sensPlayer() {
         List<List<Player>> orderPerRound = new ArrayList<>();
         for (int round = 0; round < 3; round++) {
@@ -75,10 +106,16 @@ public class Round {
         return orderPerRound;
     }
 
+    /**
+     * Vérifie l'état du plateau après l'exécution des actions des joueurs.
+     */
     private void checkPlateau() {
         plateau.checkPlateau();
     }
 
+    /**
+     * Calcule les scores des joueurs à la fin du round en fonction de leur domination sur le plateau.
+     */
     public void calculateScore() {
         plateau.calculateScore(players);
     }

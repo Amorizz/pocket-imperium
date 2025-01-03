@@ -2,11 +2,23 @@ package Project.GUI;
 
 import java.util.*;
 
+/**
+ * La classe {@code VirtualPlayer} représente un joueur virtuel dans le jeu.
+ * Elle hérite de la classe {@code Player} et implémente des comportements spécifiques
+ * pour gérer les actions du joueur contrôlé par l'ordinateur, tels que le placement de bateaux
+ * et le choix des cartes de commande.
+ */
 public class VirtualPlayer extends Player {
     private Random random;
     private List<CommandCard> card;
     private int shipNbr;
 
+    /**
+     * Constructeur de la classe {@code VirtualPlayer}.
+     *
+     * @param playerName le nom du joueur virtuel.
+     * @param points     les points initiaux du joueur virtuel.
+     */
     public VirtualPlayer(String playerName, int points) {
         super(playerName, points);
         this.random = new Random();
@@ -14,6 +26,12 @@ public class VirtualPlayer extends Player {
         this.shipNbr = 15;
     }
 
+    /**
+     * Retourne la liste des cartes de commande du joueur.
+     * Si la liste est nulle, elle est initialisée pour éviter une exception.
+     *
+     * @return la liste des cartes de commande.
+     */
     @Override
     public List<CommandCard> getCards() {
         if (card == null) {
@@ -22,6 +40,10 @@ public class VirtualPlayer extends Player {
         return card;
     }
 
+    /**
+     * Permet au joueur virtuel de choisir aléatoirement un ordre de cartes de commande.
+     * L'ordre est composé de trois cartes uniques parmi trois options.
+     */
     @Override
     public void chooseOrder(ConsoleGUI console) {
         List<CommandCard> order = new ArrayList<>();
@@ -41,6 +63,11 @@ public class VirtualPlayer extends Player {
         console.println(getPlayerName() + " a choisi l'ordre suivant pour ses cartes : " + getCardsId());
     }
 
+    /**
+     * Retourne les identifiants des cartes de commande du joueur.
+     *
+     * @return une liste des identifiants des cartes.
+     */
     @Override
     public List<Integer> getCardsId() {
         List<Integer> ids = new ArrayList<>();
@@ -50,11 +77,23 @@ public class VirtualPlayer extends Player {
         return ids;
     }
 
+    /**
+     * Exécute une carte de commande spécifique pour le joueur virtuel.
+     *
+     * @param id      l'indice de la carte à exécuter.
+     * @param plateau le plateau de jeu.
+     */
     @Override
     public void Card(int id, Plateau plateau, ConsoleGUI console) {
         card.get(id).executeCard(this, plateau.getPlateau(), console);
     }
 
+    /**
+     * Permet au joueur virtuel de placer son premier bateau sur le plateau.
+     * Le placement se fait aléatoirement parmi les hexagones valides.
+     *
+     * @param plateau le plateau de jeu.
+     */
     @Override
     public void firstShip(Plateau plateau, ConsoleGUI console) {
         console.println(getPlayerName() + " place un bateau aléatoirement dans un hexagone.");
@@ -81,47 +120,25 @@ public class VirtualPlayer extends Player {
         console.println(getPlayerName() + " a placé un bateau sur l'hexagone : " + selectedHex.getId());
     }
 
-
-    public List<Hex> getValidHexes(HashMap<String, ArrayList<SectorCard>> plateau) {
-        List<Hex> validHexes = new ArrayList<>();
-        for (String niveau : plateau.keySet()) {
-            for (SectorCard sector : plateau.get(niveau)) {
-                for (Hex hex : sector.getHex().values()) {
-                    int shipsForPlayer = hex.getOccupation().getOrDefault(this, 0);
-                    if (shipsForPlayer < hex.getMaxshipon()) {
-                        validHexes.add(hex);
-                    }
-                }
-            }
-        }
-        return validHexes;
-    }
-
+    /**
+     * Retourne une liste des hexagones contrôlés par le joueur virtuel.
+     *
+     * @param plateau le plateau de jeu.
+     * @return une liste des hexagones contrôlés.
+     */
     public List<Hex> getOwnedHexes(HashMap<String, ArrayList<SectorCard>> plateau) {
         List<Hex> ownedHexes = new ArrayList<>();
         for (String niveau : plateau.keySet()) {
             for (SectorCard sector : plateau.get(niveau)) {
                 for (Hex hex : sector.getHex().values()) {
-                    if (hex.getOccupation().containsKey(this)) {
-                        ownedHexes.add(hex);
+                    for (Ship ship : hex.getOccupation()) {
+                        if (ship.getPlayerName().equals(this)) {
+                            ownedHexes.add(hex);
+                        }
                     }
                 }
             }
         }
         return ownedHexes;
-    }
-
-    public List<Hex> getEnemyHexes(HashMap<String, ArrayList<SectorCard>> plateau) {
-        List<Hex> enemyHexes = new ArrayList<>();
-        for (String niveau : plateau.keySet()) {
-            for (SectorCard sector : plateau.get(niveau)) {
-                for (Hex hex : sector.getHex().values()) {
-                    if (!hex.getOccupation().isEmpty() && !hex.getOccupation().containsKey(this)) {
-                        enemyHexes.add(hex);
-                    }
-                }
-            }
-        }
-        return enemyHexes;
     }
 }

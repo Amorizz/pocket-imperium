@@ -2,25 +2,26 @@ package Project.GUI;
 
 import java.util.*;
 
+/**
+ * La classe {@code Player} représente un joueur dans le jeu Pocket Imperium.
+ * Elle contient les informations du joueur telles que son nom, ses points, ses cartes,
+ * la couleur attribuée, et le nombre de vaisseaux qu'il possède.
+ * Cette classe gère également les actions du joueur, comme le choix des cartes
+ * et le placement des vaisseaux.
+ */
 public class Player {
-    private String playerName;
-    private List<CommandCard> cards;
-    private int points;
-    private String color;
-    private int shipNbr;
+    private String playerName; // Nom du joueur
+    private List<CommandCard> cards; // Liste des cartes du joueur
+    private int points; // Points accumulés par le joueur
+    private String color; // Couleur attribuée au joueur
+    private int shipNbr; // Nombre de vaisseaux que le joueur possède
 
-    public int getPoints() {
-        return points;
-    }
-
-    public void resetPoints() {
-        this.points = 0;
-    }
-
-    public void addPoints(int points) {
-        this.points += points;
-    }
-
+    /**
+     * Constructeur de la classe {@code Player}.
+     *
+     * @param playerName le nom du joueur.
+     * @param points     le nombre initial de points du joueur.
+     */
     public Player(String playerName, int points) {
         this.playerName = playerName;
         this.cards = new ArrayList<>();
@@ -29,22 +30,71 @@ public class Player {
         this.shipNbr = 15;
     }
 
+    /**
+     * Retourne le nombre de points accumulés par le joueur.
+     *
+     * @return les points du joueur.
+     */
+    public int getPoints() {
+        return points;
+    }
+
+    /**
+     * Réinitialise les points du joueur à zéro.
+     */
+    public void resetPoints() {
+        this.points = 0;
+    }
+
+    /**
+     * Ajoute des points au score du joueur.
+     *
+     * @param points le nombre de points à ajouter.
+     */
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+    /**
+     * Retourne le nombre de vaisseaux que possède le joueur.
+     *
+     * @return le nombre de vaisseaux.
+     */
     public int getShipNumber() {
         return shipNbr;
     }
 
+    /**
+     * Définit le nombre de vaisseaux du joueur.
+     *
+     * @param shipNbr le nouveau nombre de vaisseaux.
+     */
     public void setShipNumber(int shipNbr) {
         this.shipNbr = shipNbr;
     }
 
+    /**
+     * Retourne la couleur attribuée au joueur.
+     *
+     * @return la couleur du joueur sous forme de chaîne de caractères.
+     */
     public String getColor() {
         return color;
     }
 
+    /**
+     * Attribue une couleur au joueur.
+     *
+     * @param color l'objet {@code Color} représentant la couleur.
+     */
     public void setColor(Color color) {
         this.color = color.getColorName();
     }
 
+    /**
+     * Permet au joueur de choisir l'ordre des cartes à jouer pour ce tour.
+     * Le joueur doit sélectionner trois cartes parmi celles disponibles.
+     */
     public void chooseOrder(ConsoleGUI console) {
         List<CommandCard> order = new ArrayList<>();
         Set<Integer> selectedIds = new HashSet<>();
@@ -70,6 +120,11 @@ public class Player {
         console.println(getPlayerName() + " a choisi l'ordre suivant : " + getCardsId());
     }
 
+    /**
+     * Permet au joueur de placer un de ses premiers vaisseaux sur un hexagone disponible.
+     *
+     * @param plateau l'objet {@code Plateau} représentant le plateau de jeu.
+     */
     public void firstShip(Plateau plateau, ConsoleGUI console) {
         console.println(getPlayerName() + " place son premier bateau.");
         List<Hex> availableHexes = new ArrayList<>();
@@ -122,18 +177,39 @@ public class Player {
         console.println(getPlayerName() + " a placé un bateau sur : " + selectedHex);
     }
 
+    /**
+     * Joue une carte spécifique pour le joueur.
+     *
+     * @param id      l'index de la carte dans la liste des cartes du joueur.
+     * @param plateau l'objet {@code Plateau} représentant le plateau de jeu.
+     */
     public void Card(int id, Plateau plateau, ConsoleGUI console) {
         cards.get(id).executeCard(this, plateau.getPlateau(), console);
     }
 
+    /**
+     * Retourne le nom du joueur.
+     *
+     * @return le nom du joueur.
+     */
     public String getPlayerName() {
         return playerName;
     }
 
+    /**
+     * Retourne une copie des cartes du joueur.
+     *
+     * @return une liste des cartes du joueur.
+     */
     public List<CommandCard> getCards() {
         return new ArrayList<>(cards);
     }
 
+    /**
+     * Retourne les identifiants des cartes du joueur.
+     *
+     * @return une liste des identifiants des cartes du joueur.
+     */
     public List<Integer> getCardsId() {
         List<Integer> ids = new ArrayList<>();
         for (CommandCard card : cards) {
