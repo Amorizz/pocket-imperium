@@ -60,27 +60,32 @@ public class Hex {
         if (triPrime) {
             System.out.println("C'est le TriPri");
             // Gestion de la carte TriPrime (hexagones spécifiques)
-            int baseX = 3;
-            int baseY = 4;
-            if (place == 3){
-                this.x = baseX;
-                this.y = baseY+1;
-            } else if (place <= 2){
-                this.x = baseX + (place - 1);
-                this.y = baseY;
-            } else {
-                this.x = baseX + (place - 4);
-                this.y = baseY + 2;
-            }
+            this.x = 3;
+            this.y = 5;
         } else if (bottom || top) {
             // Gestion des cartes Top et Bottom
+            if (number == 1) {
+                int baseX = 1 + (number - 1) * 2; // Décalage horizontal pour chaque carte
+                int baseY = top ? 1 : 7;          // Niveau de départ (7 pour top, 1 pour bottom)
+
+                if (place < 2) { // Ligne 1 (2 hexagones)
+                    this.x = baseX + place;
+                    this.y = baseY;
+                } else if (place < 5) { // Ligne 2 (3 hexagones)
+                    this.x = baseX + (place - 2);
+                    this.y = baseY + 1;
+                } else { // Ligne 3 (2 hexagones)
+                    this.x = baseX + (place - 5);
+                    this.y = baseY + 2;
+                }
+            }
             int baseX = 1 + (number - 1) * 2; // Décalage horizontal pour chaque carte
             int baseY = top ? 1 : 7;          // Niveau de départ (7 pour top, 1 pour bottom)
 
             if (place < 2) { // Ligne 1 (2 hexagones)
                 this.x = baseX + place;
                 this.y = baseY;
-            } else if (place < 5) { // Ligne 2 (3 hexagones)
+            } else if (place < 4) { // Ligne 2 (3 hexagones)
                 this.x = baseX + (place - 2);
                 this.y = baseY + 1;
             } else { // Ligne 3 (2 hexagones)

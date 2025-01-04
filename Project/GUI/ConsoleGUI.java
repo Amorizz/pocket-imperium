@@ -116,7 +116,11 @@ public class ConsoleGUI extends JFrame {
                             hexCounter = drawSideSectionHexes(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
                         } else {
                             // Sections haut, bas
-                            hexCounter = drawHexagons(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                            if (col == 0) {
+                                hexCounter = drawHexagons1(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                            } else {
+                                hexCounter = drawHexagons(g2d, xOffset, margin + row * sectionHeight, hexSize, hexCounter);
+                            }
                         }
                         xOffset += sectionWidth;
                     }
@@ -135,7 +139,7 @@ public class ConsoleGUI extends JFrame {
                 return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
             }
 
-            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+            private int drawHexagons1(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
                 int[][] positions = {
                         {1, 0}, {3, 0},  // Ligne 1
                         {0, 1}, {2, 1}, {4, 1},  // Ligne 2
@@ -192,16 +196,72 @@ public class ConsoleGUI extends JFrame {
                 return level;
             }
 
+            private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
+                int[][] positions = {
+                        {1, 0}, {3, 0},  // Ligne 1
+                        {2, 1}, {4, 1},  // Ligne 2
+                        {1, 2}, {3, 2}   // Ligne 3
+                };
+
+                int horizontalSpacing = hexSize + 10;  // Ajustement pour espacer horizontalement
+                int verticalSpacing = (int) (hexSize * 1.5);  // Ajustement pour espacer verticalement
+                int sectionHorizontalCentering = (getWidth() / 3 - (4 * horizontalSpacing)) / 2;
+                int sectionVerticalCentering = (getHeight() / 3 - (3 * verticalSpacing)) / 2;
+
+                int level = startLevel;
+
+                for (int[] pos : positions) {
+                    int x = xOffset + sectionHorizontalCentering + pos[0] * horizontalSpacing;
+                    int y = yOffset + sectionVerticalCentering + pos[1] * verticalSpacing;
+
+                    Polygon hexagon = createHexagon(x, y, hexSize);
+                    g2d.setColor(Color.GRAY);
+                    g2d.fill(hexagon);
+
+                    hexagonMap.put(level, hexagon);
+
+                    // Dessiner les bateaux présents
+                    List<Color> ships = hexShips.get(level);
+                    if (ships != null) {
+                        drawShipsInHex(g2d, x, y, hexSize, ships);
+                    }
+
+                    // Récupérer le niveau depuis le plateau
+                    int  hexLevel = plateau.getLevel(level); // Vous devez implémenter getLevel dans Plateau
+
+                    // Afficher l'ID et le niveau
+                    g2d.setColor(Color.BLACK);
+                    String hexIdText = String.valueOf(level); // ID
+                    String levelText = "Lvl: " + hexLevel; // Niveau
+
+                    FontMetrics metrics = g2d.getFontMetrics();
+
+                    // Positionnement de l'ID
+                    int idTextX = x - metrics.stringWidth(hexIdText) / 2;
+                    int idTextY = y;
+
+                    // Positionnement du niveau
+                    int levelTextX = x - metrics.stringWidth(levelText) / 2;
+                    int levelTextY = y + metrics.getHeight() + 5;
+
+                    g2d.drawString(hexIdText, idTextX, idTextY); // Dessiner l'ID
+                    g2d.drawString(levelText, levelTextX, levelTextY); // Dessiner le niveau
+
+                    level++;
+                }
+
+                return level;
+            }
+
             private int drawCenterSectionHexes(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel) {
                 int[][] positions = {
-                        {1, 0}, {3, 0},  // Ligne du haut : 2 hexagones
+                          // Ligne du haut : 2 hexagones
                         {2, 1},          // Ligne du milieu : 1 hexagone
-                        {1, 2}, {3, 2}   // Ligne du bas : 2 hexagones
+                           // Ligne du bas : 2 hexagones
                 };
 
                 return drawHexagons(g2d, xOffset, yOffset, hexSize, startLevel, positions);
             }
-
 
             private int drawHexagons(Graphics2D g2d, int xOffset, int yOffset, int hexSize, int startLevel, int[][] positions) {
                 int horizontalSpacing = hexSize + 10;
@@ -271,14 +331,13 @@ public class ConsoleGUI extends JFrame {
             }
 
             private Polygon createHexagon(int x, int y, int size) {
-                Polygon hexagon = new Polygon();
-                double angle = Math.PI / 3;
+                int[] xPoints = new int[6];
+                int[] yPoints = new int[6];
                 for (int i = 0; i < 6; i++) {
-                    int x1 = (int) (x + size * Math.cos(angle * i));
-                    int y1 = (int) (y + size * Math.sin(angle * i));
-                    hexagon.addPoint(x1, y1);
+                    xPoints[i] = (int) (x + size * Math.cos(i * Math.PI / 3));
+                    yPoints[i] = (int) (y + size * Math.sin(i * Math.PI / 3));
                 }
-                return hexagon;
+                return new Polygon(xPoints, yPoints, 6);
             }
 
             private void drawBlueLines(Graphics2D g2d, int sectionWidth, int sectionHeight, int margin) {
