@@ -1,5 +1,11 @@
 package Project.Console;
 
+import Project.Console.Entity.Player;
+import Project.Console.Entity.VirtualPlayer;
+import Project.Console.Games.Color;
+import Project.Console.Games.Plateau;
+import Project.Console.Games.Round;
+
 import java.util.*;
 
 /**

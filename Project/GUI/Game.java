@@ -1,5 +1,15 @@
 package Project.GUI;
 
+import Project.GUI.Card.SectorCard;
+import Project.GUI.Console.ConsoleGUI;
+import Project.GUI.Entity.Player;
+import Project.GUI.Entity.Ship;
+import Project.GUI.Entity.VirtualPlayer;
+import Project.GUI.Games.Color;
+import Project.GUI.Games.Hex;
+import Project.GUI.Games.Plateau;
+import Project.GUI.Games.Round;
+
 import java.util.*;
 
 /**
